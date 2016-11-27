@@ -43,7 +43,7 @@ A custom matcher setting up has changed with the release of **jasmine 2.0**. Thi
  * `expect(actual).toHaveComputedColor(prop,value)` *[[see below]](#expectactualtohavecomputedcolorpropvalue)*
 
 ##### Where can I check how **DOMCustomMatchers** work?
-Examine the *[Samples of usage](#)* given below to find out how you can use DOM custom matchers.
+Examine the *[Samples of usage](#usage)* described below to find out how you can use DOM custom matchers.
  
 # Browser Support
 |Chrome|Firefox|IE|Edge|Safari|Opera|iOS Safari|Opera Mini
@@ -236,10 +236,10 @@ describe("The new DIV element", function() {
 ```
 
 # Usage
-* visit [sample site](#) and consider jasmine passed specs section (you can see how DOM custom matchers can be used)
-* consider the [HTML source](#) with the login panel sample
-* consider the [&lt;style&gt; section](#) with CSS styles for login panel
-* consider the [tests.js](#) source to figure out how matchers were implemented
+* visit [sample site](https://devrafalko.github.io/jasmine-DOM-custom-matchers/tests/jasmineRunner.html) and consider jasmine passed specs section (you can see how DOM custom matchers can be used)
+* consider the [HTML source](https://github.com/devrafalko/jasmine-DOM-custom-matchers/blob/master/tests/jasmineRunner.html) with the login panel sample
+* consider the [&lt;style&gt; section](https://github.com/devrafalko/jasmine-DOM-custom-matchers/blob/master/tests/jasmineRunner.html) with CSS styles for login panel
+* consider the [tests.js](https://github.com/devrafalko/jasmine-DOM-custom-matchers/blob/master/tests/spec/tests.js) source to figure out how matchers were implemented
 
 # License
 Released under the MIT license.
