@@ -149,6 +149,38 @@ DOMCustomMatchers.toHaveChildren = function(util){
 	};
 };
 
+DOMCustomMatchers.toBeNextSiblingOf = function(util){
+	return {
+		compare:function(actual,expected){
+			var typeCondition = util.isHTML(actual)&&util.isHTML(expected);
+			var getNextSibl = typeCondition ? expected.nextElementSibling:getNextSibl;
+			var isPassed = typeCondition ? getNextSibl===actual:false;
+			var actualSibl = getNextSibl ? " while next sibling is " + util.getType(getNextSibl):typeCondition ? " while " + util.getType(expected) + " has not got next sibling element":"";
+			return {
+				pass:isPassed,
+				message:isPassed ? "Expected " + util.getType(actual) + " not to be next sibling of " + util.getType(expected):
+								   "Expected " + util.getType(actual) + " to be next sibling of " + util.getType(expected)+actualSibl
+			};
+		}
+	};
+};
+
+DOMCustomMatchers.toBePreviousSiblingOf = function(util){
+	return {
+		compare:function(actual,expected){
+			var typeCondition = util.isHTML(actual)&&util.isHTML(expected);
+			var getPrevSibl = typeCondition ? expected.previousElementSibling:getPrevSibl;
+			var isPassed = typeCondition ? getPrevSibl===actual:false;
+			var actualSibl = getPrevSibl ? " while previous sibling is " + util.getType(getPrevSibl):typeCondition ? " while " + util.getType(expected) + " has not got previous sibling element":"";
+			return {
+				pass:isPassed,
+				message:isPassed ? "Expected " + util.getType(actual) + " not to be previous sibling of " + util.getType(expected):
+								   "Expected " + util.getType(actual) + " to be previous sibling of " + util.getType(expected)+actualSibl
+			};
+		}
+	};
+};
+
 DOMCustomMatchers.toBeEmpty = function(util){
 	return {
 		compare:function(actual){

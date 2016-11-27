@@ -20,9 +20,11 @@ describe("DOM Custom Matchers",function(){
 		
 		this.virtualDiv = document.createElement('DIV');
 		this.virtualParagraph = document.createElement('P');
+		this.virtualNextParagraph = document.createElement('P');
 		this.virtualQuote = document.createElement('BLOCKQUOTE');
 		this.virtualTextNode = document.createTextNode("hello world, I'm a virtual sample of text");
 		this.virtualDiv.appendChild(this.virtualParagraph);
+		this.virtualDiv.appendChild(this.virtualNextParagraph);
 		this.virtualParagraph.appendChild(this.virtualQuote);
 		this.virtualQuote.appendChild(this.virtualTextNode);
 		this.virtualDiv.setAttribute('class','virtual');
@@ -337,6 +339,68 @@ describe("DOM Custom Matchers",function(){
 			expect(this.emailText).not.toHaveChildren();
 			expect(this.virtualText).not.toHaveChildren();			
 		});		
+	});
+	
+	describe("toBeNextSiblingOf()",function(){
+		it("<body> should be next sibling of <head>",function(){
+			expect(document.body).toBeNextSiblingOf(document.head);
+		});
+		
+		it("<legend> should be placed before the list of inputs <ul>",function(){
+			expect(this.ul).toBeNextSiblingOf(this.legend);
+		});
+		
+		it("password input box should be preceded by email input box",function(){
+			expect(this.liB).toBeNextSiblingOf(this.liA);
+		});
+		
+		it("submit button box should be preceded by password input box",function(){
+			expect(this.liC).toBeNextSiblingOf(this.liB);
+		});
+		
+		it("submit button box should not be the next sibling of email box",function(){
+			expect(this.liC).not.toBeNextSiblingOf(this.liA);
+		});
+		
+		it("password and email input element should be preceded by <span> element",function(){
+			expect(this.passwordInput).toBeNextSiblingOf(this.passwordSpan);
+			expect(this.emailInput).toBeNextSiblingOf(this.emailSpan);
+		});
+		
+		it("dynamically created [HTML Element] should be next sibling of another dynamically created [HTML Element]",function(){
+			expect(this.virtualNextParagraph).toBeNextSiblingOf(this.virtualParagraph);
+		});
+	});
+
+	describe("toBePreviousSiblingOf()",function(){
+		it("<head> should be previous sibling of <body>",function(){
+			expect(document.head).toBePreviousSiblingOf(document.body);
+		});
+		
+		it("the list of inputs <ul> should be placed before <legend>",function(){
+			expect(this.legend).toBePreviousSiblingOf(this.ul);
+		});
+		
+		it("email input box should be preceded by password input box",function(){
+			expect(this.liA).toBePreviousSiblingOf(this.liB);
+		});
+		
+		it("password input box should be preceded by submit button box",function(){
+			expect(this.liB).toBePreviousSiblingOf(this.liC);
+		});
+		
+		it("email box should not be the previous sibling of submit button box",function(){
+			expect(this.liA).not.toBePreviousSiblingOf(this.liC);
+		});
+
+		it("<span> elements shoud be preceded by password and email input elements",function(){
+			expect(this.passwordSpan).toBePreviousSiblingOf(this.passwordInput);
+			expect(this.emailSpan).toBePreviousSiblingOf(this.emailInput);
+		});
+		
+		it("dynamically created [HTML Element] should be previous sibling of another dynamically created [HTML Element]",function(){
+			expect(this.virtualParagraph).toBePreviousSiblingOf(this.virtualNextParagraph);
+		});
 	});
 
 	describe("toBeEmpty()",function(){

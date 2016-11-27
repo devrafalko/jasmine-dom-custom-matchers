@@ -10,7 +10,7 @@
 # Description
 
 ##### How does **DOMCustomMatchers** work?
-A custom matcher setting up has changed with the release of **jasmine 2.0**. This library provides **13 custom matchers** adjusted to the new way of matchers constructing, let to compare DOM Objects relations and states.
+A custom matcher setting up has changed with the release of **jasmine 2.0**. This library provides **15 custom matchers** adjusted to the new way of matchers constructing, let to compare DOM Objects relations and states.
 
 ##### What can I use **DOMCustomMatchers** for?
  * to check if the actual parameter is HTML Element *[[see below]](#expectactualtobehtmlelementname)*
@@ -21,6 +21,8 @@ A custom matcher setting up has changed with the release of **jasmine 2.0**. Thi
  * to check if expected Node is a child of actual Node *[[see below]](#expectactualtobechildofparent)*
  * to check if expected Node is a parent of actual Node *[[see below]](#expectactualtobeparentofchild)*
  * to check if actual HTML Element has got any HTML Element children *[[see below]](#expectactualtohavechildrennumofchildren)*
+ * to check if actual HTML Element is the next sibling of expected HTML Element *[[see below]](#expectactualtobenextsiblingofexpected)*
+ * to check if actual HTML Element is the previous sibling of expected HTML Element *[[see below]](#expectactualtobeprevioussiblingofexpected)*
  * to check if HTML Element is empty (has not got any HTML ELement and HTML Text nodes) *[[see below]](#expectactualtobeempty)*
  * to check if HTML Element has got expected attribute (or expected attribute of expected value) *[[see below]](#expectactualtohaveattributenamevalue)*
  * to check if HTML Element has got expected class *[[see below]](#expectactualtohaveclassclass)*
@@ -36,6 +38,8 @@ A custom matcher setting up has changed with the release of **jasmine 2.0**. Thi
  * `expect(actual).toBeChildOf(parent)` *[[see below]](#expectactualtobechildofparent)*
  * `expect(actual).toBeParentOf(child)` *[[see below]](#expectactualtobeparentofchild)*
  * `expect(actual).toHaveChildren(numOfChildren)` *[[see below]](#expectactualtohavechildrennumofchildren)*
+ * `expect(actual).toBeNextSiblingOf(expected)` *[[see below]](#expectactualtobenextsiblingofexpected)*
+ * `expect(actual).toBePreviousSiblingOf(expected)` *[[see below]](#expectactualtobeprevioussiblingofexpected)*
  * `expect(actual).toBeEmpty()` *[[see below]](#expectactualtobeempty)*
  * `expect(actual).toHaveAttribute(name,value)` *[[see below]](#expectactualtohaveattributenamevalue)*
  * `expect(actual).toHaveClass(class)` *[[see below]](#expectactualtohaveclassclass)*
@@ -134,6 +138,26 @@ Examine the *[Samples of usage](#usage)* described below to find out how you can
 * return **true** if `actual` contains at least one [HTML Element] child node *(if `numOfChildren` not passed)*
 * return **true** if `actual` contains expected number of [HTML Element] child nodes *(if `numOfChildren` passed)*
 * return **true** regardless `actual` [HTML Element] Object is appended to the DOM or not
+
+##### `expect(actual).toBeNextSiblingOf(expected)`
+* check if `actual` [HTML Element] Object is the next element sibling of `expected` [HTML Element] Object
+* both `actual` and `expected` must be of type [HTML Element]
+* it **ignores** [HTML Text] and [HTML Comment] sibling Objects
+* return **false** if `actual` or `expected` is not [HTML Element] Object
+* return **false** if `actual` is not the next element sibling of `expected`
+* return **false** if `expected` has not got any next element sibling
+* return **true** if `actual` is the next element sibling of `expected`
+* return **true** regardless `actual` and `expected` is appended to the DOM or not
+
+##### `expect(actual).toBePreviousSiblingOf(expected)`
+* check if `actual` [HTML Element] Object is the previous element sibling of `expected` [HTML Element] Object
+* both `actual` and `expected` must be of type [HTML Element]
+* it **ignores** [HTML Text] and [HTML Comment] sibling Objects
+* return **false** if `actual` or `expected` is not [HTML Element] Object
+* return **false** if `actual` is not the previous element sibling of `expected`
+* return **false** if `expected` has not got any previous element sibling
+* return **true** if `actual` is the previous element sibling of `expected`
+* return **true** regardless `actual` and `expected` is appended to the DOM or not
 
 ##### `expect(actual).toBeEmpty()`
 * check if `actual` [HTML Element] Object has not got any [HTML Element] or [HTML Text] child nodes
