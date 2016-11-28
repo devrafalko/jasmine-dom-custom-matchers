@@ -313,6 +313,24 @@ describe("DOM Custom Matchers",function(){
 			expect(this.ul).toHaveChildren(3);
 		});
 		
+		it("<ul> should have less than 4 children",function(){
+			expect(this.ul).toHaveChildren(4,'less than');
+		});
+		
+		it("<ul> should have more than 2 children",function(){
+			expect(this.ul).toHaveChildren(2,'more than');
+		});
+		
+		it("<ul> should have 3 children or less",function(){
+			expect(this.ul).toHaveChildren(3,'or less');
+			expect(this.ul).toHaveChildren(3,'orless');
+			expect(this.ul).toHaveChildren(3,'orLess');
+		});
+		
+		it("<ul> should have 3 children or more",function(){
+			expect(this.ul).toHaveChildren(3,'or more');
+		});
+		
 		it("<ul> should not have 5 children",function(){
 			expect(this.ul).not.toHaveChildren(5);
 		});
@@ -333,12 +351,12 @@ describe("DOM Custom Matchers",function(){
 			expect(this.virtualDiv).toHaveChildren();
 			expect(this.virtualParagraph).toHaveChildren();
 			expect(this.virtualQuote).not.toHaveChildren();
-		});	
+		});
 		
 		it("[HTML Text] Object cannot have any children",function(){
 			expect(this.emailText).not.toHaveChildren();
 			expect(this.virtualText).not.toHaveChildren();			
-		});		
+		});
 	});
 	
 	describe("toBeNextSiblingOf()",function(){

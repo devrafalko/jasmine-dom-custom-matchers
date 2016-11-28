@@ -20,7 +20,7 @@ A custom matcher setting up has changed with the release of **jasmine 2.0**. Thi
  * to check if actual HTML Element or its HTML Element descendants contain expected text *[[see below]](#expectactualtocontaintextcontent)*
  * to check if expected Node is a child of actual Node *[[see below]](#expectactualtobechildofparent)*
  * to check if expected Node is a parent of actual Node *[[see below]](#expectactualtobeparentofchild)*
- * to check if actual HTML Element has got any HTML Element children *[[see below]](#expectactualtohavechildrennumofchildren)*
+ * to check if actual HTML Element has got any HTML Element children *[[see below]](#expectactualtohavechildrennumofchildrenoperator)*
  * to check if actual HTML Element is the next sibling of expected HTML Element *[[see below]](#expectactualtobenextsiblingofexpected)*
  * to check if actual HTML Element is the previous sibling of expected HTML Element *[[see below]](#expectactualtobeprevioussiblingofexpected)*
  * to check if HTML Element is empty (has not got any HTML ELement and HTML Text nodes) *[[see below]](#expectactualtobeempty)*
@@ -37,7 +37,7 @@ A custom matcher setting up has changed with the release of **jasmine 2.0**. Thi
  * `expect(actual).toContainText(content)` *[[see below]](#expectactualtocontaintextcontent)*
  * `expect(actual).toBeChildOf(parent)` *[[see below]](#expectactualtobechildofparent)*
  * `expect(actual).toBeParentOf(child)` *[[see below]](#expectactualtobeparentofchild)*
- * `expect(actual).toHaveChildren(numOfChildren)` *[[see below]](#expectactualtohavechildrennumofchildren)*
+ * `expect(actual).toHaveChildren(numOfChildren)` *[[see below]](#expectactualtohavechildrennumofchildrenoperator)*
  * `expect(actual).toBeNextSiblingOf(expected)` *[[see below]](#expectactualtobenextsiblingofexpected)*
  * `expect(actual).toBePreviousSiblingOf(expected)` *[[see below]](#expectactualtobeprevioussiblingofexpected)*
  * `expect(actual).toBeEmpty()` *[[see below]](#expectactualtobeempty)*
@@ -125,18 +125,30 @@ Examine the *[Samples of usage](#usage)* described below to find out how you can
 * return **true** if `actual` is the direct parent node of `child`
 * return **true** regardless `actual` and `child` are appended to the DOM or not
 
-##### `expect(actual).toHaveChildren(numOfChildren)`
+##### `expect(actual).toHaveChildren(numOfChildren,operator)`
 * check if `actual` [HTML Element] Object **contains any** [HTML Element] **child nodes**
 * it **ignores** [HTML Text] and [HTML Comment] Objects
-* `numOfChildren` is optional
-* `numOfChildren` *if passed* must be of type [Number] equal or bigger than `0`
-* if `numOfChildren` is not of type [Number] or is less than `0`, it is ignored as if it was not passed (matcher checks if `actual` contains **any** [HTML Element] Object)
-* `numOfChildren` *if passed*, the matcher checks if `actual` contains expected `numOfChildren` **number of [HTML Element] child nodes**
+* `numOfChildren` is optional, *if passed* must be of type [Number] equal or bigger than `0`
+* `numOfChildren`, *if passed* the matcher checks if the number of `actual` child nodes **equals** to expected `numOfChildren`
+* if `numOfChildren` is not of type [Number] or is less than `0`, it is ignored as if it was not passed
+* `operator` is optional, *if passed* must be the one of following [String] values: `or more`, `or less`, `more than`, `less than`
+
+> `expect(actual).toHaveChildren(3)` the matcher checks if `actual` has got 3 element nodes
+
+> `expect(actual).toHaveChildren(3,'or more')` the matcher checks if `actual` has got 3 or more than 3 element nodes
+
+> `expect(actual).toHaveChildren(3,'or less')` the matcher checks if `actual` has got 3 or less than 3 element nodes
+
+> `expect(actual).toHaveChildren(3,'more than')` the matcher checks if `actual` has got more than 3 element nodes
+
+> `expect(actual).toHaveChildren(3,'less than')` the matcher checks if `actual` has got less than 3 element nodes
+
+* if `operator` is not the one of indicated four values, it is ignored as if it was not passed
 * return **false** if `actual` is not [HTML Element] Object
 * return **false** if `actual` does not contain any [HTML Element] child nodes *(if `numOfChildren` not passed)*
-* return **false** if `actual` does not contain expected number of [HTML Element] child nodes *(if `numOfChildren` passed)*
+* return **false** if `actual` does not contain expected number of [HTML Element] child nodes *(if `numOfChildren`|`operator` passed)*
 * return **true** if `actual` contains at least one [HTML Element] child node *(if `numOfChildren` not passed)*
-* return **true** if `actual` contains expected number of [HTML Element] child nodes *(if `numOfChildren` passed)*
+* return **true** if `actual` contains expected number of [HTML Element] child nodes *(if `numOfChildren`|`operator` passed)*
 * return **true** regardless `actual` [HTML Element] Object is appended to the DOM or not
 
 ##### `expect(actual).toBeNextSiblingOf(expected)`

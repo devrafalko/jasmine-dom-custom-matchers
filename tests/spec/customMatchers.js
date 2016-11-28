@@ -134,17 +134,34 @@ DOMCustomMatchers.toBeParentOf = function(util){
 
 DOMCustomMatchers.toHaveChildren = function(util){
 	return {
-		compare:function(actual,expected){
+		compare:function(actual,expected,operator){
 			var typeCondition = util.isHTML(actual);
-			var getNumber = typeCondition ? util.is(expected,'Number')&&expected>=0:false;
-			var numberCondition = typeCondition ? getNumber ? actual.children.length===expected:actual.children.length>0:false;
-			var messageNumber = getNumber ? expected +' child node(s)':'any child node';
-			var messageCorrectNum = typeCondition ? " when it contains " + actual.children.length + " child node(s).":".";
+			var getOperator;
+			var hasOperator = [/\s*or\s*more\s*/i,/\s*or\s*less\s*/i,/\s*more\s*than\s*/i,/\s*less\s*than\s*/i].some(function(val,ind){
+				var returned = typeof operator==='string' ? Boolean(operator.match(val)):false;
+				getOperator = returned!==false ? ind:getOperator;
+				return returned;
+			});
+			var isExpected = typeCondition ? util.is(expected,'Number')&&expected>=0:false;
+			var isPassed = typeCondition ? isExpected ? checkEquality():actual.children.length>0:false;
+			var mOperator = [' or more ',' or less','more than ','less than '];
+			var mExpected = getOperator > 1 ? mOperator[getOperator]+expected:getOperator <=1 ? expected+mOperator[getOperator]:expected;
+			var mNumber = isExpected ? mExpected + ' child node(s)':'any child node';
+			var mCorrectNum = typeCondition ? " when it contains " + actual.children.length + " child node(s).":".";
 			return {
-				pass:numberCondition,
-				message:numberCondition ?	"Expected " + util.getType(actual) + " not to contain " + messageNumber + messageCorrectNum:
-													"Expected " + util.getType(actual) + " to contain " + messageNumber + messageCorrectNum
+				pass:isPassed,
+				message:isPassed ?	"Expected " + util.getType(actual) + " not to contain " + mNumber + mCorrectNum:
+													"Expected " + util.getType(actual) + " to contain " + mNumber + mCorrectNum
 			};
+			
+				function checkEquality(){
+					var l = actual.children.length, r = expected;
+					if(!hasOperator) return l===r;
+					if(getOperator===0) return l>=r;
+					if(getOperator===1) return l<=r;
+					if(getOperator===2) return l>r;
+					if(getOperator===3) return l<r;
+				}			
 		}
 	};
 };
@@ -176,6 +193,58 @@ DOMCustomMatchers.toBePreviousSiblingOf = function(util){
 				pass:isPassed,
 				message:isPassed ? "Expected " + util.getType(actual) + " not to be previous sibling of " + util.getType(expected):
 								   "Expected " + util.getType(actual) + " to be previous sibling of " + util.getType(expected)+actualSibl
+			};
+		}
+	};
+};
+
+DOMCustomMatchers.toHaveSameParent = function(util){
+	return {
+		compare:function(actual,expected){
+			
+			
+			return {
+				pass:true,
+				message:""
+			};
+		}
+	};
+};
+
+DOMCustomMatchers.toBeNthChild = function(util){	//'last'
+	return {
+		compare:function(actual,expected){
+			
+			
+			return {
+				pass:true,
+				message:""
+			};
+		}
+	};
+};
+
+DOMCustomMatchers.toHaveEventListener = function(util){
+	return {
+		compare:function(actual,expected){
+			
+			
+			return {
+				pass:true,
+				message:""
+			};
+		}
+	};
+};
+
+DOMCustomMatchers.toHaveAttributes = function(util){
+	return {
+		compare:function(actual,expected){
+			
+			
+			return {
+				pass:true,
+				message:""
 			};
 		}
 	};
