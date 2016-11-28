@@ -125,6 +125,14 @@ Examine the *[Samples of usage](#usage)* described below to find out how you can
 * return **true** if `actual` is the direct parent node of `child`
 * return **true** regardless `actual` and `child` are appended to the DOM or not
 
+##### `expect(actual).toHaveSameParent(node)`
+* check if `actual` and `node` are the children of the same [HTML Element] Object
+* `actual` and `node` must be of type [HTML Element] or [HTML Text]
+* return **false** if `actual` or `node` is not [HTML Element] or [HTML Text] Object
+* return **false** if `actual` and `node` are not the children of the same [HTML Element] Object
+* return **true** if `actual` and `node` are the children of the same [HTML Element] Object
+* return **true** regardless `actual` and `node` are appended to the DOM or not
+
 ##### `expect(actual).toHaveChildren(numOfChildren,operator)`
 * check if `actual` [HTML Element] Object **contains any** [HTML Element] **child nodes**
 * it **ignores** [HTML Text] and [HTML Comment] Objects
