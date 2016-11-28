@@ -522,6 +522,28 @@ describe("DOM Custom Matchers",function(){
 		});
 	});
 
+	describe("toHaveAnyAttribute()",function(){
+		it("<head> element should not have any attribute",function(){
+			expect(document.head).not.toHaveAnyAttribute();
+		});		
+		it("<form> <fieldset> and <li> elements should have some attributes defined",function(){
+			expect(this.form).toHaveAnyAttribute();
+			expect(this.fieldset).toHaveAnyAttribute();
+			expect(this.liA).toHaveAnyAttribute();
+			expect(this.liB).toHaveAnyAttribute();
+			expect(this.liC).toHaveAnyAttribute();
+		});	
+		
+		it("dynamically created [HTML Element] should also have some attributes",function(){
+			expect(this.virtualDiv).toHaveAnyAttribute();
+		});
+		
+		it("[HTML Text] nodes should throw faulty result when tested",function(){
+			expect(this.virtualTextNode).not.toHaveAnyAttribute();
+			expect(this.passwordText).not.toHaveAnyAttribute();
+		});	
+	});
+
 	describe("toHaveAttribute()",function(){
 		it("<form> should have id='form' attribute defined",function(){
 			expect(this.form).toHaveAttribute('id','form');

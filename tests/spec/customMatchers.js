@@ -262,19 +262,6 @@ DOMCustomMatchers.toHaveEventListener = function(util){
 	};
 };
 
-DOMCustomMatchers.toHaveAttributes = function(util){
-	return {
-		compare:function(actual,expected){
-			
-			
-			return {
-				pass:true,
-				message:""
-			};
-		}
-	};
-};
-
 DOMCustomMatchers.toBeEmpty = function(util){
 	return {
 		compare:function(actual){
@@ -297,6 +284,20 @@ DOMCustomMatchers.toBeEmpty = function(util){
 			};
 		}
 	};		
+};
+
+DOMCustomMatchers.toHaveAnyAttribute = function(util){
+	return {
+		compare:function(actual){
+			var typeCondition = util.isHTML(actual);
+			var isPassed = typeCondition? actual.hasAttributes():false;
+			return {
+				pass:isPassed,
+				message:isPassed ? "Expected " + util.getType(actual) + " not to have any attributes defined":
+								   "Expected " + util.getType(actual) + " to have any attributes defined"
+			};
+		}
+	};
 };
 
 DOMCustomMatchers.toHaveAttribute = function(util){

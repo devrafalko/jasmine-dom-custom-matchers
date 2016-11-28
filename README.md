@@ -10,7 +10,7 @@
 # Description
 
 ##### How does **DOMCustomMatchers** work?
-A custom matcher setting up has changed with the release of **jasmine 2.0**. This library provides **17 custom matchers** adjusted to the new way of matchers constructing, let to compare DOM Objects relations and states.
+A custom matcher setting up has changed with the release of **jasmine 2.0**. This library provides **18 custom matchers** adjusted to the new way of matchers constructing, let to compare DOM Objects relations and states.
 
 ##### What can I use **DOMCustomMatchers** for?
  * to check if the actual parameter is HTML Element *[[see below]](#expectactualtobehtmlelementname)*
@@ -26,6 +26,7 @@ A custom matcher setting up has changed with the release of **jasmine 2.0**. Thi
  * to check if actual HTML Element is the next sibling of expected HTML Element *[[see below]](#expectactualtobenextsiblingofexpected)*
  * to check if actual HTML Element is the previous sibling of expected HTML Element *[[see below]](#expectactualtobeprevioussiblingofexpected)*
  * to check if HTML Element is empty (has not got any HTML ELement and HTML Text nodes) *[[see below]](#expectactualtobeempty)*
+ * to check if HTML Element has got any attributes defined *[[see below]](#expectactualtohaveanyattribute)*
  * to check if HTML Element has got expected attribute (or expected attribute of expected value) *[[see below]](#expectactualtohaveattributenamevalue)*
  * to check if HTML Element has got expected class *[[see below]](#expectactualtohaveclassclass)*
  * to check if HTML Element (DOM node) has got expected style (computed style) *[[see below]](#expectactualtohavecomputedstylepropvalue)*
@@ -45,6 +46,7 @@ A custom matcher setting up has changed with the release of **jasmine 2.0**. Thi
  * `expect(actual).toBeNextSiblingOf(expected)` *[[see below]](#expectactualtobenextsiblingofexpected)*
  * `expect(actual).toBePreviousSiblingOf(expected)` *[[see below]](#expectactualtobeprevioussiblingofexpected)*
  * `expect(actual).toBeEmpty()` *[[see below]](#expectactualtobeempty)*
+ * `expect(actual).toHaveAnyAttribute()` *[[see below]](#expectactualtohaveanyattribute)*
  * `expect(actual).toHaveAttribute(name,value)` *[[see below]](#expectactualtohaveattributenamevalue)*
  * `expect(actual).toHaveClass(class)` *[[see below]](#expectactualtohaveclassclass)*
  * `expect(actual).toHaveComputedStyle(prop,value)` *[[see below]](#expectactualtohavecomputedstylepropvalue)*
@@ -200,6 +202,12 @@ Examine the *[Samples of usage](#usage)* described below to find out how you can
 * return **true** regardless `actual` [HTML Element] Object is appended to the DOM or not
 
 > the difference between .toBeEmpty() matcher and .toHaveChildren() matcher is that .toBeEmpty() matcher checks if the actual [HTML Element] Object contains both [HTML Element] and [HTML Text] Objects when .toHaveChildren() matcher checks if the actual [HTML Element] Object contains only [HTML Element] Objects.
+
+##### `expect(actual).toHaveAnyAttribute()`
+* check if `actual` [HTML Element] Object has got any attribute defined
+* return **false** if `actual` is not [HTML Element] Object
+* return **false** if `actual` is has not got any attribute defined
+* return **true** if `actual` is has got at least one attribute defined
 
 ##### `expect(actual).toHaveAttribute(name,value)`
 * check if `actual` [HTML Element] Object has expected attribute `name` of expected `value`
