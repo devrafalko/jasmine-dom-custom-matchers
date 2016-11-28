@@ -118,6 +118,43 @@ DOMCustomMatchers.toBeChildOf = function(util){
 	};
 };
 
+DOMCustomMatchers.toBeNthChild = function(util){
+	return {
+		compare:function(actual,index){
+			var typeCondition = util.isHTML(actual);
+			var isIndexNumber = util.is(index,'number') ? index>=0:false;
+			var isIndexLast = util.is(index,'string') ? Boolean(index.match(/\s*last\s*/i)):false;
+			var childObj = typeCondition ? util.isHTML(actual.parentNode) ? actual.parentNode.children:[]:[];
+			var isPassed = !typeCondition ? false:isIndexNumber ? actual===childObj[index]:isIndexLast ? actual===childObj[childObj.length-1]:false;
+			var actualIndex = findIndex();
+			var mPosition = !typeCondition ? "":
+					actualIndex===null ? 
+						" while " + util.getType(actual) + " has not got parent Element":
+						" while it is "+actualIndex+ending(actualIndex)+" child node of its parent Element";
+			return {
+				pass:isPassed,
+				message:isPassed ? "Expected " + util.getType(actual) + " not to be " +index+ending(index)+" child node of its parent"+mPosition:
+								   "Expected " + util.getType(actual) + " to be " +index+ending(index)+" child node of its parent"+mPosition
+			};
+
+				function findIndex(){
+					for(var i=0;i<childObj.length;i++){
+						if(actual===childObj[i]) return i;
+					}
+					return null;
+				}
+				
+				function ending(num){
+					return num === 1 ? "st":
+						   num === 2 ? "nd":
+						   num === 3 ? "rd":
+						   typeof num === 'number' ? "th":
+						   "";
+				}
+		}
+	};
+};
+
 DOMCustomMatchers.toBeParentOf = function(util){
 	return {
 		compare:function(actual,expected){
@@ -132,18 +169,107 @@ DOMCustomMatchers.toBeParentOf = function(util){
 	};
 };
 
-DOMCustomMatchers.toHaveChildren = function(util){
+DOMCustomMatchers.toHaveSameParent = function(util){
 	return {
 		compare:function(actual,expected){
-			var typeCondition = util.isHTML(actual);
-			var getNumber = typeCondition ? util.is(expected,'Number')&&expected>=0:false;
-			var numberCondition = typeCondition ? getNumber ? actual.children.length===expected:actual.children.length>0:false;
-			var messageNumber = getNumber ? expected +' child node(s)':'any child node';
-			var messageCorrectNum = typeCondition ? " when it contains " + actual.children.length + " child node(s).":".";
+			var typeCondition = (util.isHTML(actual)||util.is(actual,'text'))&&(util.isHTML(expected)||util.is(expected,'text'));
+			var isPassed = typeCondition ? actual.parentNode === expected.parentNode:false;
 			return {
-				pass:numberCondition,
-				message:numberCondition ?	"Expected " + util.getType(actual) + " not to contain " + messageNumber + messageCorrectNum:
-													"Expected " + util.getType(actual) + " to contain " + messageNumber + messageCorrectNum
+				pass:isPassed,
+				message:isPassed ? "Expected " + util.getType(actual) + " not to have the same parent as " + util.getType(expected):
+								   "Expected " + util.getType(actual) + " to have the same parent as " + util.getType(expected)
+			};
+		}
+	};
+};
+
+DOMCustomMatchers.toHaveChildren = function(util){
+	return {
+		compare:function(actual,expected,operator){
+			var typeCondition = util.isHTML(actual);
+			var getOperator;
+			var hasOperator = [/\s*or\s*more\s*/i,/\s*or\s*less\s*/i,/\s*more\s*than\s*/i,/\s*less\s*than\s*/i].some(function(val,ind){
+				var returned = typeof operator==='string' ? Boolean(operator.match(val)):false;
+				getOperator = returned!==false ? ind:getOperator;
+				return returned;
+			});
+			var isExpected = typeCondition ? util.is(expected,'Number')&&expected>=0:false;
+			var isPassed = typeCondition ? isExpected ? checkEquality():actual.children.length>0:false;
+			var mOperator = [' or more ',' or less','more than ','less than '];
+			var mExpected = getOperator > 1 ? mOperator[getOperator]+expected:getOperator <=1 ? expected+mOperator[getOperator]:expected;
+			var mNumber = isExpected ? mExpected + ' child node(s)':'any child node';
+			var mCorrectNum = typeCondition ? " when it contains " + actual.children.length + " child node(s).":".";
+			return {
+				pass:isPassed,
+				message:isPassed ?	"Expected " + util.getType(actual) + " not to contain " + mNumber + mCorrectNum:
+													"Expected " + util.getType(actual) + " to contain " + mNumber + mCorrectNum
+			};
+			
+				function checkEquality(){
+					var l = actual.children.length, r = expected;
+					if(!hasOperator) return l===r;
+					if(getOperator===0) return l>=r;
+					if(getOperator===1) return l<=r;
+					if(getOperator===2) return l>r;
+					if(getOperator===3) return l<r;
+				}			
+		}
+	};
+};
+
+DOMCustomMatchers.toBeNextSiblingOf = function(util){
+	return {
+		compare:function(actual,expected){
+			var typeCondition = util.isHTML(actual)&&util.isHTML(expected);
+			var getNextSibl = typeCondition ? expected.nextElementSibling:getNextSibl;
+			var isPassed = typeCondition ? getNextSibl===actual:false;
+			var actualSibl = getNextSibl ? " while next sibling is " + util.getType(getNextSibl):typeCondition ? " while " + util.getType(expected) + " has not got next sibling element":"";
+			return {
+				pass:isPassed,
+				message:isPassed ? "Expected " + util.getType(actual) + " not to be next sibling of " + util.getType(expected):
+								   "Expected " + util.getType(actual) + " to be next sibling of " + util.getType(expected)+actualSibl
+			};
+		}
+	};
+};
+
+DOMCustomMatchers.toBePreviousSiblingOf = function(util){
+	return {
+		compare:function(actual,expected){
+			var typeCondition = util.isHTML(actual)&&util.isHTML(expected);
+			var getPrevSibl = typeCondition ? expected.previousElementSibling:getPrevSibl;
+			var isPassed = typeCondition ? getPrevSibl===actual:false;
+			var actualSibl = getPrevSibl ? " while previous sibling is " + util.getType(getPrevSibl):typeCondition ? " while " + util.getType(expected) + " has not got previous sibling element":"";
+			return {
+				pass:isPassed,
+				message:isPassed ? "Expected " + util.getType(actual) + " not to be previous sibling of " + util.getType(expected):
+								   "Expected " + util.getType(actual) + " to be previous sibling of " + util.getType(expected)+actualSibl
+			};
+		}
+	};
+};
+
+DOMCustomMatchers.toHaveEventListener = function(util){
+	return {
+		compare:function(actual,expected){
+			
+			
+			return {
+				pass:true,
+				message:""
+			};
+		}
+	};
+};
+
+DOMCustomMatchers.toHaveAttributes = function(util){
+	return {
+		compare:function(actual,expected){
+			
+			
+			return {
+				pass:true,
+				message:""
 			};
 		}
 	};

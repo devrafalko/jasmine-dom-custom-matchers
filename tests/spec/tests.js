@@ -20,9 +20,11 @@ describe("DOM Custom Matchers",function(){
 		
 		this.virtualDiv = document.createElement('DIV');
 		this.virtualParagraph = document.createElement('P');
+		this.virtualNextParagraph = document.createElement('P');
 		this.virtualQuote = document.createElement('BLOCKQUOTE');
 		this.virtualTextNode = document.createTextNode("hello world, I'm a virtual sample of text");
 		this.virtualDiv.appendChild(this.virtualParagraph);
+		this.virtualDiv.appendChild(this.virtualNextParagraph);
 		this.virtualParagraph.appendChild(this.virtualQuote);
 		this.virtualQuote.appendChild(this.virtualTextNode);
 		this.virtualDiv.setAttribute('class','virtual');
@@ -259,6 +261,39 @@ describe("DOM Custom Matchers",function(){
 		});
 	});
 
+	describe("toBeNthChild()",function(){
+		it("inputs should be the second node of its parent elements",function(){
+			expect(this.emailInput).toBeNthChild(1);
+			expect(this.passwordInput).toBeNthChild(1);
+		});
+		
+		it("<head> should be first and <body> should be last element of <html> element",function(){
+			expect(document.head).toBeNthChild(0);
+			expect(document.body).toBeNthChild('last');
+		});
+		
+		it("<legend> should be first child of <fieldset> element",function(){
+			expect(this.legend).toBeNthChild(0);
+		});
+		
+		it("dynamically created one and only [HTML Element] child node should be first and last child of its parent element",function(){
+			expect(this.virtualQuote).toBeNthChild(0);
+			expect(this.virtualQuote).toBeNthChild('last');
+		});
+		
+		it("test for <html> should throw faulty result because <html> has not got its [HTML Element] parent",function(){
+			expect(document.head).toBeNthChild(0);
+			expect(document.body).toBeNthChild('last');
+		});
+		
+		it("test for dynamically created and not appended [HTML Element] node should throw faulty result because it has not got its [HTML Element] parent",function(){
+			expect(this.virtualDiv).not.toBeNthChild(0);
+			expect(this.virtualDiv).not.toBeNthChild(1);
+			expect(this.virtualDiv).not.toBeNthChild(2);
+			expect(this.virtualDiv).not.toBeNthChild(3);
+		});
+	});
+	
 	describe("toBeParentOf()",function(){
 		it("<fieldset> should be a parent of <legend> and <ul>",function(){
 			expect(this.fieldset).toBeParentOf(this.legend);
@@ -302,6 +337,46 @@ describe("DOM Custom Matchers",function(){
 		});
 	});
 
+	describe("toHaveSameParent()",function(){
+		it("<body> and <head> should have the same <html> parent",function(){
+			expect(document.body).toHaveSameParent(document.head);
+		});
+		
+		it("all <li> elements should have the same <ul> parent",function(){
+			expect(this.liA).toHaveSameParent(this.liB);
+			expect(this.liB).toHaveSameParent(this.liC);
+			expect(this.liC).toHaveSameParent(this.liA);
+		});
+		
+		it("email and password inputs and its <span> descriptions should be placed in the same <li> parent",function(){
+			expect(this.emailSpan).toHaveSameParent(this.emailInput);
+			expect(this.passwordSpan).toHaveSameParent(this.passwordInput);
+		});
+		
+		it("<legend> and <ul> should be placed in the same <fieldset> parent",function(){
+			expect(this.legend).toHaveSameParent(this.ul);
+		});
+		
+		it("email input, password input and submit button should be placed in different <li> elements",function(){
+			expect(this.emailInput).not.toHaveSameParent(this.passwordInput);
+			expect(this.passwordInput).not.toHaveSameParent(this.submit);
+			expect(this.submit).not.toHaveSameParent(this.emailInput);
+		});
+		
+		it("dynamically created [HTML Element] siblings should have the same dynamically created [HTML Element] parent",function(){
+			expect(this.virtualParagraph).toHaveSameParent(this.virtualNextParagraph);
+		});
+		
+		it("Two [HTML Text] sibling nodes should have the same [HTML Element] parent",function(){
+			var container = document.createElement('P');
+			var textA = document.createTextNode('Hello ');
+			var textB = document.createTextNode('World!');
+			container.appendChild(textA);
+			container.appendChild(textB);
+			expect(textA).toHaveSameParent(textB);
+		});
+	});
+
 	describe("toHaveChildren()",function(){
 		it("<ul> should have any children",function(){
 			expect(this.ul).toHaveChildren();
@@ -309,6 +384,24 @@ describe("DOM Custom Matchers",function(){
 		
 		it("<ul> should have 3 children",function(){
 			expect(this.ul).toHaveChildren(3);
+		});
+		
+		it("<ul> should have less than 4 children",function(){
+			expect(this.ul).toHaveChildren(4,'less than');
+		});
+		
+		it("<ul> should have more than 2 children",function(){
+			expect(this.ul).toHaveChildren(2,'more than');
+		});
+		
+		it("<ul> should have 3 children or less",function(){
+			expect(this.ul).toHaveChildren(3,'or less');
+			expect(this.ul).toHaveChildren(3,'orless');
+			expect(this.ul).toHaveChildren(3,'orLess');
+		});
+		
+		it("<ul> should have 3 children or more",function(){
+			expect(this.ul).toHaveChildren(3,'or more');
 		});
 		
 		it("<ul> should not have 5 children",function(){
@@ -331,12 +424,74 @@ describe("DOM Custom Matchers",function(){
 			expect(this.virtualDiv).toHaveChildren();
 			expect(this.virtualParagraph).toHaveChildren();
 			expect(this.virtualQuote).not.toHaveChildren();
-		});	
+		});
 		
 		it("[HTML Text] Object cannot have any children",function(){
 			expect(this.emailText).not.toHaveChildren();
 			expect(this.virtualText).not.toHaveChildren();			
-		});		
+		});
+	});
+	
+	describe("toBeNextSiblingOf()",function(){
+		it("<body> should be next sibling of <head>",function(){
+			expect(document.body).toBeNextSiblingOf(document.head);
+		});
+		
+		it("<legend> should be placed before the list of inputs <ul>",function(){
+			expect(this.ul).toBeNextSiblingOf(this.legend);
+		});
+		
+		it("password input box should be preceded by email input box",function(){
+			expect(this.liB).toBeNextSiblingOf(this.liA);
+		});
+		
+		it("submit button box should be preceded by password input box",function(){
+			expect(this.liC).toBeNextSiblingOf(this.liB);
+		});
+		
+		it("submit button box should not be the next sibling of email box",function(){
+			expect(this.liC).not.toBeNextSiblingOf(this.liA);
+		});
+		
+		it("password and email input element should be preceded by <span> element",function(){
+			expect(this.passwordInput).toBeNextSiblingOf(this.passwordSpan);
+			expect(this.emailInput).toBeNextSiblingOf(this.emailSpan);
+		});
+		
+		it("dynamically created [HTML Element] should be next sibling of another dynamically created [HTML Element]",function(){
+			expect(this.virtualNextParagraph).toBeNextSiblingOf(this.virtualParagraph);
+		});
+	});
+
+	describe("toBePreviousSiblingOf()",function(){
+		it("<head> should be previous sibling of <body>",function(){
+			expect(document.head).toBePreviousSiblingOf(document.body);
+		});
+		
+		it("the list of inputs <ul> should be placed before <legend>",function(){
+			expect(this.legend).toBePreviousSiblingOf(this.ul);
+		});
+		
+		it("email input box should be preceded by password input box",function(){
+			expect(this.liA).toBePreviousSiblingOf(this.liB);
+		});
+		
+		it("password input box should be preceded by submit button box",function(){
+			expect(this.liB).toBePreviousSiblingOf(this.liC);
+		});
+		
+		it("email box should not be the previous sibling of submit button box",function(){
+			expect(this.liA).not.toBePreviousSiblingOf(this.liC);
+		});
+
+		it("<span> elements shoud be preceded by password and email input elements",function(){
+			expect(this.passwordSpan).toBePreviousSiblingOf(this.passwordInput);
+			expect(this.emailSpan).toBePreviousSiblingOf(this.emailInput);
+		});
+		
+		it("dynamically created [HTML Element] should be previous sibling of another dynamically created [HTML Element]",function(){
+			expect(this.virtualParagraph).toBePreviousSiblingOf(this.virtualNextParagraph);
+		});
 	});
 
 	describe("toBeEmpty()",function(){
