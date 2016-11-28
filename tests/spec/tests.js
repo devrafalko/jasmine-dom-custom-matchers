@@ -304,6 +304,46 @@ describe("DOM Custom Matchers",function(){
 		});
 	});
 
+	fdescribe("toHaveSameParent()",function(){
+		it("<body> and <head> should have the same <html> parent",function(){
+			expect(document.body).toHaveSameParent(document.head);
+		});
+		
+		it("all <li> elements should have the same <ul> parent",function(){
+			expect(this.liA).toHaveSameParent(this.liB);
+			expect(this.liB).toHaveSameParent(this.liC);
+			expect(this.liC).toHaveSameParent(this.liA);
+		});
+		
+		it("email and password inputs and its <span> descriptions should be placed in the same <li> parent",function(){
+			expect(this.emailSpan).toHaveSameParent(this.emailInput);
+			expect(this.passwordSpan).toHaveSameParent(this.passwordInput);
+		});
+		
+		it("<legend> and <ul> should be placed in the same <fieldset> parent",function(){
+			expect(this.legend).toHaveSameParent(this.ul);
+		});
+		
+		it("email input, password input and submit button should be placed in different <li> elements",function(){
+			expect(this.emailInput).not.toHaveSameParent(this.passwordInput);
+			expect(this.passwordInput).not.toHaveSameParent(this.submit);
+			expect(this.submit).not.toHaveSameParent(this.emailInput);
+		});
+		
+		it("dynamically created [HTML Element] siblings should have the same dynamically created [HTML Element] parent",function(){
+			expect(this.virtualParagraph).toHaveSameParent(this.virtualNextParagraph);
+		});
+		
+		it("Two [HTML Text] sibling nodes should have the same [HTML Element] parent",function(){
+			var container = document.createElement('P');
+			var textA = document.createTextNode('Hello ');
+			var textB = document.createTextNode('World!');
+			container.appendChild(textA);
+			container.appendChild(textB);
+			expect(textA).toHaveSameParent(textB);
+		});
+	});
+
 	describe("toHaveChildren()",function(){
 		it("<ul> should have any children",function(){
 			expect(this.ul).toHaveChildren();

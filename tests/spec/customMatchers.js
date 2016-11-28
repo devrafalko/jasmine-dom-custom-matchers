@@ -132,6 +132,20 @@ DOMCustomMatchers.toBeParentOf = function(util){
 	};
 };
 
+DOMCustomMatchers.toHaveSameParent = function(util){
+	return {
+		compare:function(actual,expected){
+			var typeCondition = (util.isHTML(actual)||util.is(actual,'text'))&&(util.isHTML(expected)||util.is(expected,'text'));
+			var isPassed = typeCondition ? actual.parentNode === expected.parentNode:false;
+			return {
+				pass:isPassed,
+				message:isPassed ? "Expected " + util.getType(actual) + " not to have the same parent as " + util.getType(expected):
+								   "Expected " + util.getType(actual) + " to have the same parent as " + util.getType(expected)
+			};
+		}
+	};
+};
+
 DOMCustomMatchers.toHaveChildren = function(util){
 	return {
 		compare:function(actual,expected,operator){
@@ -193,19 +207,6 @@ DOMCustomMatchers.toBePreviousSiblingOf = function(util){
 				pass:isPassed,
 				message:isPassed ? "Expected " + util.getType(actual) + " not to be previous sibling of " + util.getType(expected):
 								   "Expected " + util.getType(actual) + " to be previous sibling of " + util.getType(expected)+actualSibl
-			};
-		}
-	};
-};
-
-DOMCustomMatchers.toHaveSameParent = function(util){
-	return {
-		compare:function(actual,expected){
-			
-			
-			return {
-				pass:true,
-				message:""
 			};
 		}
 	};

@@ -20,6 +20,7 @@ A custom matcher setting up has changed with the release of **jasmine 2.0**. Thi
  * to check if actual HTML Element or its HTML Element descendants contain expected text *[[see below]](#expectactualtocontaintextcontent)*
  * to check if expected Node is a child of actual Node *[[see below]](#expectactualtobechildofparent)*
  * to check if expected Node is a parent of actual Node *[[see below]](#expectactualtobeparentofchild)*
+ * to check i actual and expected nodes have got the same HTML Element parent *[[see below]](#expectactualtohavesameparentnode)*
  * to check if actual HTML Element has got any HTML Element children *[[see below]](#expectactualtohavechildrennumofchildrenoperator)*
  * to check if actual HTML Element is the next sibling of expected HTML Element *[[see below]](#expectactualtobenextsiblingofexpected)*
  * to check if actual HTML Element is the previous sibling of expected HTML Element *[[see below]](#expectactualtobeprevioussiblingofexpected)*
@@ -37,6 +38,7 @@ A custom matcher setting up has changed with the release of **jasmine 2.0**. Thi
  * `expect(actual).toContainText(content)` *[[see below]](#expectactualtocontaintextcontent)*
  * `expect(actual).toBeChildOf(parent)` *[[see below]](#expectactualtobechildofparent)*
  * `expect(actual).toBeParentOf(child)` *[[see below]](#expectactualtobeparentofchild)*
+ * `expect(actual).toHaveSameParent(node)` *[[see below]](#expectactualtohavesameparentnode)*
  * `expect(actual).toHaveChildren(numOfChildren)` *[[see below]](#expectactualtohavechildrennumofchildrenoperator)*
  * `expect(actual).toBeNextSiblingOf(expected)` *[[see below]](#expectactualtobenextsiblingofexpected)*
  * `expect(actual).toBePreviousSiblingOf(expected)` *[[see below]](#expectactualtobeprevioussiblingofexpected)*
@@ -124,6 +126,14 @@ Examine the *[Samples of usage](#usage)* described below to find out how you can
 * return **false** if `actual` and `child` is the same object
 * return **true** if `actual` is the direct parent node of `child`
 * return **true** regardless `actual` and `child` are appended to the DOM or not
+
+##### `expect(actual).toHaveSameParent(node)`
+* check if `actual` and `node` are the children of the same [HTML Element] Object
+* `actual` and `node` must be of type [HTML Element] or [HTML Text]
+* return **false** if `actual` or `node` is not [HTML Element] or [HTML Text] Object
+* return **false** if `actual` and `node` are not the children of the same [HTML Element] Object
+* return **true** if `actual` and `node` are the children of the same [HTML Element] Object
+* return **true** regardless `actual` and `node` are appended to the DOM or not
 
 ##### `expect(actual).toHaveChildren(numOfChildren,operator)`
 * check if `actual` [HTML Element] Object **contains any** [HTML Element] **child nodes**
