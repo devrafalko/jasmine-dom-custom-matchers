@@ -118,6 +118,43 @@ DOMCustomMatchers.toBeChildOf = function(util){
 	};
 };
 
+DOMCustomMatchers.toBeNthChild = function(util){
+	return {
+		compare:function(actual,index){
+			var typeCondition = util.isHTML(actual);
+			var isIndexNumber = util.is(index,'number') ? index>=0:false;
+			var isIndexLast = util.is(index,'string') ? Boolean(index.match(/\s*last\s*/i)):false;
+			var childObj = typeCondition ? util.isHTML(actual.parentNode) ? actual.parentNode.children:[]:[];
+			var isPassed = !typeCondition ? false:isIndexNumber ? actual===childObj[index]:isIndexLast ? actual===childObj[childObj.length-1]:false;
+			var actualIndex = findIndex();
+			var mPosition = !typeCondition ? "":
+					actualIndex===null ? 
+						" while " + util.getType(actual) + " has not got parent Element":
+						" while it is "+actualIndex+ending(actualIndex)+" child node of its parent Element";
+			return {
+				pass:isPassed,
+				message:isPassed ? "Expected " + util.getType(actual) + " not to be " +index+ending(index)+" child node of its parent"+mPosition:
+								   "Expected " + util.getType(actual) + " to be " +index+ending(index)+" child node of its parent"+mPosition
+			};
+
+				function findIndex(){
+					for(var i=0;i<childObj.length;i++){
+						if(actual===childObj[i]) return i;
+					}
+					return null;
+				}
+				
+				function ending(num){
+					return num === 1 ? "st":
+						   num === 2 ? "nd":
+						   num === 3 ? "rd":
+						   typeof num === 'number' ? "th":
+						   "";
+				}
+		}
+	};
+};
+
 DOMCustomMatchers.toBeParentOf = function(util){
 	return {
 		compare:function(actual,expected){
@@ -207,19 +244,6 @@ DOMCustomMatchers.toBePreviousSiblingOf = function(util){
 				pass:isPassed,
 				message:isPassed ? "Expected " + util.getType(actual) + " not to be previous sibling of " + util.getType(expected):
 								   "Expected " + util.getType(actual) + " to be previous sibling of " + util.getType(expected)+actualSibl
-			};
-		}
-	};
-};
-
-DOMCustomMatchers.toBeNthChild = function(util){	//'last'
-	return {
-		compare:function(actual,expected){
-			
-			
-			return {
-				pass:true,
-				message:""
 			};
 		}
 	};

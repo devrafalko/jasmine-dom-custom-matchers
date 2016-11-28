@@ -261,6 +261,39 @@ describe("DOM Custom Matchers",function(){
 		});
 	});
 
+	describe("toBeNthChild()",function(){
+		it("inputs should be the second node of its parent elements",function(){
+			expect(this.emailInput).toBeNthChild(1);
+			expect(this.passwordInput).toBeNthChild(1);
+		});
+		
+		it("<head> should be first and <body> should be last element of <html> element",function(){
+			expect(document.head).toBeNthChild(0);
+			expect(document.body).toBeNthChild('last');
+		});
+		
+		it("<legend> should be first child of <fieldset> element",function(){
+			expect(this.legend).toBeNthChild(0);
+		});
+		
+		it("dynamically created one and only [HTML Element] child node should be first and last child of its parent element",function(){
+			expect(this.virtualQuote).toBeNthChild(0);
+			expect(this.virtualQuote).toBeNthChild('last');
+		});
+		
+		it("test for <html> should throw faulty result because <html> has not got its [HTML Element] parent",function(){
+			expect(document.head).toBeNthChild(0);
+			expect(document.body).toBeNthChild('last');
+		});
+		
+		it("test for dynamically created and not appended [HTML Element] node should throw faulty result because it has not got its [HTML Element] parent",function(){
+			expect(this.virtualDiv).not.toBeNthChild(0);
+			expect(this.virtualDiv).not.toBeNthChild(1);
+			expect(this.virtualDiv).not.toBeNthChild(2);
+			expect(this.virtualDiv).not.toBeNthChild(3);
+		});
+	});
+	
 	describe("toBeParentOf()",function(){
 		it("<fieldset> should be a parent of <legend> and <ul>",function(){
 			expect(this.fieldset).toBeParentOf(this.legend);
@@ -304,7 +337,7 @@ describe("DOM Custom Matchers",function(){
 		});
 	});
 
-	fdescribe("toHaveSameParent()",function(){
+	describe("toHaveSameParent()",function(){
 		it("<body> and <head> should have the same <html> parent",function(){
 			expect(document.body).toHaveSameParent(document.head);
 		});
