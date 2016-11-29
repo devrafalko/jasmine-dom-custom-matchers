@@ -249,19 +249,6 @@ DOMCustomMatchers.toBePreviousSiblingOf = function(util){
 	};
 };
 
-DOMCustomMatchers.toHaveEventListener = function(util){
-	return {
-		compare:function(actual,expected){
-			
-			
-			return {
-				pass:true,
-				message:""
-			};
-		}
-	};
-};
-
 DOMCustomMatchers.toBeEmpty = function(util){
 	return {
 		compare:function(actual){
@@ -470,6 +457,24 @@ DOMCustomMatchers.toHaveComputedColor = function(util){
 				parsed[3] = Number(parsed[3].toFixed(2));
 				return parsed;
 			}
+		}
+	};
+};
+
+DOMCustomMatchers.toHaveEvent = function(util){
+	return {
+		compare:function(actual,ev){
+			var typeCondition = util.isHTML(actual);
+			var isEventString = util.is(ev,'string');
+			var getEvent = isEventString ? ev.replace(/\s/g,"").toLowerCase():ev;
+			var parseEvent = isEventString ? getEvent.search('on')===0 ? getEvent:'on'+getEvent:parseEvent;
+			var isPassed = typeCondition ? Boolean(actual[parseEvent]):false;
+			var isRecognized = typeCondition ? typeof actual[parseEvent]==='undefined' ? "unrecognized ":parseEvent:"";
+			return {
+				pass:isPassed,
+				message: isPassed ? "Expected "+util.getType(actual)+" not to have "+isRecognized+" event attached":
+									"Expected "+util.getType(actual)+" to have "+isRecognized+" event attached"
+			};
 		}
 	};
 };

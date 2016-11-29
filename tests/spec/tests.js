@@ -18,6 +18,13 @@ describe("DOM Custom Matchers",function(){
 		this.passwordInput = document.getElementById('passwordInput');
 		this.submit = document.getElementById('submit');
 		
+		var that = this;
+		this.submit.onclick = function(){
+			if(that.emailInput.value===""||that.passwordInput.value===""){
+				window.alert('fill empty inputs!');
+			}
+		};
+		
 		this.virtualDiv = document.createElement('DIV');
 		this.virtualParagraph = document.createElement('P');
 		this.virtualNextParagraph = document.createElement('P');
@@ -569,8 +576,8 @@ describe("DOM Custom Matchers",function(){
 			expect(this.liC).toHaveAttribute('id',/li\w+/);
 		});
 
-		it("submit element should be of type submit, should be disabled and have value='Login'",function(){
-			expect(this.submit).toHaveAttribute('disabled');
+		it("submit element should be of type submit, should not be disabled and have value='Login'",function(){
+			expect(this.submit).not.toHaveAttribute('disabled');
 			expect(this.submit).toHaveAttribute('type','submit');
 			expect(this.submit).toHaveAttribute('value',/login/i);
 		});
@@ -703,10 +710,44 @@ describe("DOM Custom Matchers",function(){
 		});
 		
 	});
+	describe("toHaveEvent()",function(){
+		it("email input should have onmouseover event attached",function(){
+			expect(this.emailInput).toHaveEvent('mouseover');
+			expect(this.emailInput).toHaveEvent('onmouseover');
+		});
+		
+		it("form element should have onsubmit event attached",function(){
+			this.form.onsubmit = function(e){
+				e.preventDefault();
+			};
+			expect(this.form).toHaveEvent('submit');
+		});
+		
+		it("submit button should have onclick event attached",function(){
+			expect(this.submit).toHaveEvent('click');
+			expect(this.submit).toHaveEvent('onclick');
+		});
+		
+		it("incorrect event names should throw faulty result",function(){
+			expect(this.form).not.toHaveEvent('subbbbmit');
+			expect(this.submit).not.toHaveEvent('clickkkkk');
+		});
+		
+		it("event attached by addEventListener() method should throw faulty result",function(){
+			this.passwordInput.addEventListener('mouseover',function(){
+				return 'hello world!';
+			});
+			expect(this.passwordInput).not.toHaveEvent('mouseover');
+		});
 
+		it("dynamically created [HTML Element] should have also some events attached",function(){
+			this.virtualDiv.onclick = function(){return 'hello world!';};
+			this.virtualDiv.onmouseover = function(){return 'hello world!';};
+			expect(this.virtualDiv).toHaveEvent('click');
+			expect(this.virtualDiv).toHaveEvent('onmouseover');
+		});			
+	});
 });
-
-
 
 
 
