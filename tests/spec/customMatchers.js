@@ -1,418 +1,407 @@
 var DOMCustomMatchers = {};
 
-jasmine.matchersUtil.is = function(getObject,getType){
+jasmine.matchersUtil.dom = {};
+
+jasmine.matchersUtil.dom.is = function(getObject,getType){
 	if(getObject===null||typeof getObject==="undefined") return false;
 	return getObject.constructor.toString().toLowerCase().search(getType.toLowerCase())>=0;
 };
 
-jasmine.matchersUtil.isHTML = function(getElem){
+jasmine.matchersUtil.dom.isHTML = function(getElem){
 	if(getElem===null||typeof getElem==="undefined") return false;
 	return this.is(getElem,"html")&&this.is(getElem,"element");	
 };
 
-jasmine.matchersUtil.getType = function(getValue){
+jasmine.matchersUtil.dom.getType = function(getValue){
 	return getValue===null ? 'null':typeof getValue==="undefined" ? 'undefined':getValue.constructor.name;
 };
 
-jasmine.matchersUtil.shortenStr = function(getValue){
-	return getValue.length>50 ? getValue.slice(0,50)+"...":getValue;
+jasmine.matchersUtil.dom.shortenStr = function(getValue){
+	if(typeof getValue ==='string') {
+		return getValue.length>50 ? getValue.slice(0,50)+"...":getValue;
+		} else {
+			return getValue;
+			}
 };
 
+jasmine.matchersUtil.dom.test = function(condition,messageNot,messageFail){
+	return {
+		pass: condition,
+		message: condition ? messageNot:messageFail
+	};
+};
 
+jasmine.matchersUtil.dom.notMsg = function(isNot){
+	return isNot ? " not":"";
+};
 
-
+jasmine.matchersUtil.dom.returnBlock = function(fun){
+	return {
+		compare:function(){
+			return fun(arguments);
+		},
+		negativeCompare:function(){
+			return fun(arguments,true);
+		}
+	};
+};
 
 DOMCustomMatchers.toBeHTMLElement = function(util){
 	return {
-		compare:function(actual,expected){
-			var typeCondition = util.isHTML(actual);
-			var isExpectedString = util.is(expected,'String');
-			var parseExpected = isExpectedString ? expected.replace(/\W/g,''):'';
-			var getName = isExpectedString&&parseExpected!=='';
-			var nameCondition = typeCondition && getName ? actual.nodeName===parseExpected.toUpperCase():true;
-			var messageElement = getName ? '<'+parseExpected.toLowerCase()+'>':'HTML';
-			return {
-				pass:typeCondition&&nameCondition,
-				message:typeCondition&&nameCondition ? "Expected " + util.getType(actual) + " not to be a " + messageElement + " Element.":
-									"Expected " + util.getType(actual) + " to be a " + messageElement + " Element."
-			};
+		compare:function(elem,tag){
+			var elemValid, tagValid, newTag, tagTest, pass, msgTag, msgNot, msgFail;
+			elemValid = util.dom.isHTML(elem);
+			tagValid = util.dom.is(tag,'String');
+			newTag = tagValid ? tag.replace(/\W/g,''):'';
+			tagTest = elemValid && newTag.length ? elem.nodeName===newTag.toUpperCase():true;
+			pass = elemValid&&tagTest;
+			msgTag = newTag ? '<'+newTag.toLowerCase()+'>':'HTML';
+			msgNot = "Expected " + util.dom.getType(elem) + " not to be a " + msgTag + " Element";
+			msgFail = "Expected " + util.dom.getType(elem) + " to be a " + msgTag + " Element";
+			return util.dom.test(pass,msgNot,msgFail);
 		}
 	};
 };
 
 DOMCustomMatchers.toBeHTMLText = function(util){
 	return {
-		compare:function(actual,value){
-			var isActual = util.is(actual,'text');
-			var isValueString = util.is(value,'string');
-			var isValueRegExp = util.is(value,'regexp');
-			var containText = !isActual ? true:isValueString ? actual.textContent===value:isValueRegExp ? Boolean(actual.textContent.match(value)):true;
-			var returnText = isActual&&isValueString ? " containing the content '" + util.shortenStr(value) + "'.":isActual&&isValueRegExp ? " of the content that matches regular expression "+value+".":".";
-			return {
-				pass:isActual&&containText,
-				message:isActual&&containText ? "Expected " + util.getType(actual) + " not to be the [HTML Text] Object"+returnText:
-									"Expected " + util.getType(actual) + " to be the [HTML Text] Object"+returnText
-			};
+		compare:function(elem,val){
+			var elemValid, strValid, regValid, strTest, regTest, pass, msgStr, msgReg, msgContent, msgNot, msgFail;
+			elemValid = util.dom.is(elem,'text');
+			strValid = util.dom.is(val,'string');
+			regValid = util.dom.is(val,'regexp');
+			strTest = elemValid && strValid ? elem.textContent===val:true;
+			regTest = elemValid && regValid ? Boolean(elem.textContent.match(val)):true;
+			pass = elemValid && strTest && regTest;
+			msgStr = " of content '" + util.dom.shortenStr(val) + "'";
+			msgReg = " of content matching regular expression "+val;
+			msgContent = elemValid&&strValid ? msgStr:elemValid&&regValid ? msgReg:"";
+			msgNot = "Expected " + util.dom.getType(elem) + " not to be the [HTML Text] Object"+msgContent;
+			msgFail = "Expected " + util.dom.getType(elem) + " to be the [HTML Text] Object"+msgContent;
+			return util.dom.test(pass,msgNot,msgFail);
 		}
 	};
 };
 
 DOMCustomMatchers.toBeDocumentNode = function(util){
-	return {
-		compare:function(actual){
-			var typeCondition = util.isHTML(actual)||util.is(actual,'text');
-			var isDOMNode = typeCondition ? document.documentElement.contains(actual):false;
-			var returnDOM = typeCondition&&!isDOMNode ? " (not a document node)":"";
-			return {
-				pass:typeCondition&&isDOMNode,
-				message:typeCondition&&isDOMNode ?	"Expected " + util.getType(actual) + returnDOM + " not to be the document node.":
-													"Expected " + util.getType(actual) + returnDOM + " to be the document node."
-			};
-		}
-	};
+	return util.dom.returnBlock(function(o,not){
+		var elem = o[0], elemValid, domTest, pass, msgDOM, msg;
+		elemValid = util.dom.isHTML(elem)||util.dom.is(elem,'text');
+		domTest = elemValid ? document.documentElement.contains(elem):false;
+		pass = not ? elemValid&&!domTest:elemValid&&domTest;
+		msgDOM = elemValid&&!domTest ? " (not a document node)":"";
+		msg = "Expected " + util.dom.getType(elem) + msgDOM + util.dom.notMsg(not) + " to be the document node";
+		return util.dom.test(pass,msg,msg);
+	});
 };
 
 DOMCustomMatchers.toContainHTMLElement = function(util){
-	return {
-		compare:function(actual,expected){
-			var typeCondition = util.isHTML(actual) && util.isHTML(expected);
-			var contains = typeCondition ? actual.contains(expected)&&actual!==expected:false;
-			return {
-				pass:typeCondition&&contains,
-				message:typeCondition&&contains ?	"Expected " + util.getType(actual) + " not to contain " + util.getType(expected):
-													"Expected " + util.getType(actual) + " to contain " + util.getType(expected)
-			};
-		}
-	};
+	return util.dom.returnBlock(function(o,not){
+		var elem = o[0], child = o[1], elemValid, childTest, pass, msg;
+		elemValid = util.dom.isHTML(elem) && util.dom.isHTML(child);
+		childTest = elemValid ? elem.contains(child)&&elem!==child:false;
+		pass = not ? elemValid&&!childTest:elemValid&&childTest;
+		msg = "Expected " + util.dom.getType(elem) + util.dom.notMsg(not) + " to contain " + util.dom.getType(child);
+		return util.dom.test(pass,msg,msg);
+	});
 };
 
 DOMCustomMatchers.toContainText = function(util){
-	return {
-		compare:function(actual,expected){
-			var typeCondition = util.isHTML(actual);
-			var isStr = util.is(expected,'string');
-			var isRegEx = util.is(expected,'regexp');
-			var parsedActual = typeCondition ? actual.textContent.replace(/(\n|\t|\v)/g," ").replace(/\s\s+/g," ").replace(/^\s/,""):actual;
-			var matchText = typeCondition&&(isStr||isRegEx) ? Boolean(parsedActual.match(expected)):false;
-			var messageExpected = isStr ? "'"+util.shortenStr(expected)+"'":isRegEx ? "regular expression " + expected:util.getType(expected) + " while text or regular expression was expected.";
-			return {
-				pass:matchText,
-				message:matchText ? "Expected " + util.getType(actual) + " not to contain " + messageExpected:
-									"Expected " + util.getType(actual) + " to contain " + messageExpected
-			};
-		}
-	};	
+	return util.dom.returnBlock(function(o,not){
+		var elem = o[0], text = o[1], elemValid, strValid, regValid, parseText, textTest, paramValid, pass, msgStr, msgReg, msgUnvalid, msgText, msg;
+		elemValid = util.dom.isHTML(elem);
+		strValid = util.dom.is(text,'string');
+		regValid = util.dom.is(text,'regexp');
+		paramValid = elemValid&&(strValid||regValid);
+		parseText = elemValid ? elem.textContent.replace(/(\n|\t|\v)/g," ").replace(/\s\s+/g," ").replace(/^\s/,""):parseText;
+		textTest = paramValid ? Boolean(parseText.match(text)):false;
+		pass = not ? paramValid&&!textTest:paramValid&&textTest;
+		msgStr = "'"+util.dom.shortenStr(text)+"'";
+		msgReg = "regular expression " + text;
+		msgUnvalid = util.dom.getType(text) + " while text or regular expression was expected";
+		msgText = strValid ? msgStr:regValid ? msgReg:msgUnvalid;
+		msg = "Expected " + util.dom.getType(elem) + util.dom.notMsg(not) + " to contain " + msgText;
+		return util.dom.test(pass,msg,msg);
+	});	
 };
 
 DOMCustomMatchers.toBeChildOf = function(util){
-	return {
-		compare:function(actual,expected){
-			var typeCondition = (util.isHTML(actual)||util.is(actual,'text')) && util.isHTML(expected);
-			var isChildOf = typeCondition ? actual.parentNode === expected:false;
-			return {
-				pass:typeCondition&&isChildOf,
-				message:typeCondition&&isChildOf ?	"Expected " + util.getType(actual) + " not to be the child element of " + util.getType(expected):
-													"Expected " + util.getType(actual) + " to be the child element of " + util.getType(expected)
-			};
-		}
-	};
+	return util.dom.returnBlock(function(o,not){
+		var child = o[0], parent = o[1], paramValid, paramTest, pass, msg;
+		paramValid = (util.dom.isHTML(child)||util.dom.is(child,'text')) && util.dom.isHTML(parent);
+		paramTest = paramValid ? child.parentNode === parent:false;
+		pass = not ? paramValid&&!paramTest:paramValid&&paramTest;
+		msg = "Expected " + util.dom.getType(child) + util.dom.notMsg(not) + " to be the child element of " + util.dom.getType(parent);
+		return util.dom.test(pass,msg,msg);
+	});
 };
 
 DOMCustomMatchers.toBeNthChild = function(util){
-	return {
-		compare:function(actual,index){
-			var typeCondition = util.isHTML(actual);
-			var isIndexNumber = util.is(index,'number') ? index>=0:false;
-			var isIndexLast = util.is(index,'string') ? Boolean(index.match(/\s*last\s*/i)):false;
-			var childObj = typeCondition ? util.isHTML(actual.parentNode) ? actual.parentNode.children:[]:[];
-			var isPassed = !typeCondition ? false:isIndexNumber ? actual===childObj[index]:isIndexLast ? actual===childObj[childObj.length-1]:false;
-			var actualIndex = findIndex();
-			var mPosition = !typeCondition ? "":
-					actualIndex===null ? 
-						" while " + util.getType(actual) + " has not got parent Element":
-						" while it is "+actualIndex+ending(actualIndex)+" child node of its parent Element";
-			return {
-				pass:isPassed,
-				message:isPassed ? "Expected " + util.getType(actual) + " not to be " +index+ending(index)+" child node of its parent"+mPosition:
-								   "Expected " + util.getType(actual) + " to be " +index+ending(index)+" child node of its parent"+mPosition
-			};
+	return util.dom.returnBlock(function(o,not){
+		var elem = o[0], index = o[1], elemValid, numValid, strValid, valid, children, indexTest, pass, msgIndex, msgNotParent, msgActualInd, msgAdd, msg;
+		elemValid = util.dom.isHTML(elem);
+		numValid = util.dom.is(index,'number') ? index>=0:false;
+		strValid = util.dom.is(index,'string') ? Boolean(index.match(/\s*last\s*/i)):false;
+		valid = elemValid&&(numValid||strValid);
+		children = elemValid ? util.dom.isHTML(elem.parentNode) ? elem.parentNode.children:[]:[];
+		indexTest = !elemValid ? false:numValid ? elem===children[index]:strValid ? elem===children[children.length-1]:false;
+		pass = not ? valid&&!indexTest:valid&&indexTest;
+		msgIndex = findIndex();
+		index = numValid ? index+1:strValid ? "'"+index+"'":"[incorrect index value]";
+		msgNotParent = " while " + util.dom.getType(elem) + " has not got parent Element";
+		msgActualInd = " while it is "+msgIndex+ending(msgIndex)+" child node of its parent Element";
+		msgAdd = !elemValid ? "":msgIndex === null ? msgNotParent:msgActualInd;
+		msg = "Expected " + util.dom.getType(elem) + util.dom.notMsg(not) + " to be " +index+ending(index)+" child node of its parent"+msgAdd;
+		return util.dom.test(pass,msg,msg);
+		
+			function findIndex(){
+				for(var i=0;i<children.length;i++) if(elem===children[i]) return i+1;
+				return null;
+			}
 
-				function findIndex(){
-					for(var i=0;i<childObj.length;i++){
-						if(actual===childObj[i]) return i;
-					}
-					return null;
-				}
-				
-				function ending(num){
-					return num === 1 ? "st":
-						   num === 2 ? "nd":
-						   num === 3 ? "rd":
-						   typeof num === 'number' ? "th":
-						   "";
-				}
-		}
-	};
+			function ending(n){
+				return n === 1 ? "st":n === 2 ? "nd":n === 3 ? "rd":typeof n === 'number' ? "th":"";
+			}
+	});		
 };
 
 DOMCustomMatchers.toBeParentOf = function(util){
-	return {
-		compare:function(actual,expected){
-			var typeCondition = util.isHTML(actual) && (util.isHTML(expected)||util.is(expected,'text'));
-			var isParentOf = typeCondition ? expected.parentElement === actual:false;
-			return {
-				pass:typeCondition&&isParentOf,
-				message:typeCondition&&isParentOf ?	"Expected " + util.getType(expected) + " not to be the parent element of " + util.getType(actual):
-													"Expected " + util.getType(expected) + " to be the parent element of " + util.getType(actual)
-			};
-		}
-	};
+	return util.dom.returnBlock(function(o,not){
+		var parent = o[0], child = o[1], paramValid, paramTest, pass, msg;
+		paramValid = util.dom.isHTML(parent) && (util.dom.isHTML(child)||util.dom.is(child,'text'));
+		paramTest = paramValid ? child.parentElement === parent:false;
+		pass = not ? paramValid&&!paramTest:paramValid&&paramTest;
+		msg = "Expected " + util.dom.getType(child) + util.dom.notMsg(not) + " to be the parent element of " + util.dom.getType(parent);
+		return util.dom.test(pass,msg,msg);
+	});		
 };
 
 DOMCustomMatchers.toHaveSameParent = function(util){
-	return {
-		compare:function(actual,expected){
-			var typeCondition = (util.isHTML(actual)||util.is(actual,'text'))&&(util.isHTML(expected)||util.is(expected,'text'));
-			var isPassed = typeCondition ? actual.parentNode === expected.parentNode:false;
-			return {
-				pass:isPassed,
-				message:isPassed ? "Expected " + util.getType(actual) + " not to have the same parent as " + util.getType(expected):
-								   "Expected " + util.getType(actual) + " to have the same parent as " + util.getType(expected)
-			};
-		}
-	};
+	return util.dom.returnBlock(function(o,not){
+		var childA = o[0], childB = o[1], childAValid, childBValid, valid, parentTest, pass, msg;
+		childAValid = util.dom.isHTML(childA)||util.dom.is(childA,'text');
+		childBValid = util.dom.isHTML(childB)||util.dom.is(childB,'text');
+		valid = childAValid&&childBValid;
+		parentTest = valid ? childA.parentNode === childB.parentNode:false;
+		pass = not ? valid&&!parentTest:valid&&parentTest;
+		msg = "Expected " + util.dom.getType(childA) + util.dom.notMsg(not) + " to have the same parent as " + util.dom.getType(childB);		
+		return util.dom.test(pass,msg,msg);
+	});		
 };
 
 DOMCustomMatchers.toHaveChildren = function(util){
-	return {
-		compare:function(actual,expected,operator){
-			var typeCondition = util.isHTML(actual);
-			var getOperator;
-			var hasOperator = [/\s*or\s*more\s*/i,/\s*or\s*less\s*/i,/\s*more\s*than\s*/i,/\s*less\s*than\s*/i].some(function(val,ind){
-				var returned = typeof operator==='string' ? Boolean(operator.match(val)):false;
-				getOperator = returned!==false ? ind:getOperator;
-				return returned;
-			});
-			var isExpected = typeCondition ? util.is(expected,'Number')&&expected>=0:false;
-			var isPassed = typeCondition ? isExpected ? checkEquality():actual.children.length>0:false;
-			var mOperator = [' or more ',' or less','more than ','less than '];
-			var mExpected = getOperator > 1 ? mOperator[getOperator]+expected:getOperator <=1 ? expected+mOperator[getOperator]:expected;
-			var mNumber = isExpected ? mExpected + ' child node(s)':'any child node';
-			var mCorrectNum = typeCondition ? " when it contains " + actual.children.length + " child node(s).":".";
-			return {
-				pass:isPassed,
-				message:isPassed ?	"Expected " + util.getType(actual) + " not to contain " + mNumber + mCorrectNum:
-													"Expected " + util.getType(actual) + " to contain " + mNumber + mCorrectNum
-			};
-			
-				function checkEquality(){
-					var l = actual.children.length, r = expected;
-					if(!hasOperator) return l===r;
-					if(getOperator===0) return l>=r;
-					if(getOperator===1) return l<=r;
-					if(getOperator===2) return l>r;
-					if(getOperator===3) return l<r;
-				}			
-		}
-	};
+	return util.dom.returnBlock(function(o,not){
+		var parent = o[0], num = o[1], op = o[2], getOp, ops, parentValid, opValid, msg, msgAdd, msgNum, msgOperator, pass, numTest, numValid;
+		ops = [/\s*or\s*more\s*/i,/\s*or\s*less\s*/i,/\s*more\s*than\s*/i,/\s*less\s*than\s*/i];
+		parentValid = util.dom.isHTML(parent);
+		opValid = ops.some(findOperator);
+		numValid = parentValid ? util.dom.is(num,'Number')&&num>=0:false;
+		numTest = parentValid ? numValid ? checkEquality():parent.children.length>0:false;
+		pass = not ? parentValid&&!numTest:parentValid&&numTest;
+		msgOperator = [' or more ',' or less','more than ','less than '];
+		msgNum = getOp > 1 ? msgOperator[getOp]+num:getOp <=1 ? num+msgOperator[getOp]:num;
+		msgNum = numValid ? msgNum + ' child node(s)':'any child node';
+		msgAdd = parentValid ? " when it contains " + parent.children.length + " child node(s).":".";
+		msg = "Expected " + util.dom.getType(parent) + util.dom.notMsg(not) + " to contain " + msgNum + msgAdd;
+		return util.dom.test(pass,msg,msg);
+		
+			function findOperator(val,ind){
+				var returned = typeof op === 'string' ? Boolean(op.match(val)):false;
+				getOp = returned!==false ? ind:getOp;
+				return returned;					
+			}
+
+			function checkEquality(){
+				var l = parent.children.length, r = num, eq = [l>=r,l<=r,l>r,l<r];
+				return !opValid ? l===r:eq[getOp];
+			}		
+	});
 };
 
 DOMCustomMatchers.toBeNextSiblingOf = function(util){
-	return {
-		compare:function(actual,expected){
-			var typeCondition = util.isHTML(actual)&&util.isHTML(expected);
-			var getNextSibl = typeCondition ? expected.nextElementSibling:getNextSibl;
-			var isPassed = typeCondition ? getNextSibl===actual:false;
-			var actualSibl = getNextSibl ? " while next sibling is " + util.getType(getNextSibl):typeCondition ? " while " + util.getType(expected) + " has not got next sibling element":"";
-			return {
-				pass:isPassed,
-				message:isPassed ? "Expected " + util.getType(actual) + " not to be next sibling of " + util.getType(expected):
-								   "Expected " + util.getType(actual) + " to be next sibling of " + util.getType(expected)+actualSibl
-			};
-		}
-	};
+	return util.dom.returnBlock(function(o,not){
+		var sibA = o[0], sibB = o[1], sibValid, next, nextTest, pass, msgNext, msgNull, msgAdd, msg;
+		sibValid = util.dom.isHTML(sibA)&&util.dom.isHTML(sibB);
+		next = sibValid ? sibB.nextElementSibling:next;
+		nextTest = sibValid ? next===sibA:false;
+		pass = not ? sibValid&&!nextTest:sibValid&&nextTest;
+		msgNext = " while next sibling is " + util.dom.getType(next);
+		msgNull = " while " + util.dom.getType(sibB) + " has not got next sibling element";
+		msgAdd = not ? "":next ? msgNext:sibValid ? msgNull:"";
+		msg = "Expected " + util.dom.getType(sibA) + util.dom.notMsg(not) + " to be next sibling of " + util.dom.getType(sibB)+msgAdd;
+		return util.dom.test(pass,msg,msg);
+	});		
 };
 
 DOMCustomMatchers.toBePreviousSiblingOf = function(util){
-	return {
-		compare:function(actual,expected){
-			var typeCondition = util.isHTML(actual)&&util.isHTML(expected);
-			var getPrevSibl = typeCondition ? expected.previousElementSibling:getPrevSibl;
-			var isPassed = typeCondition ? getPrevSibl===actual:false;
-			var actualSibl = getPrevSibl ? " while previous sibling is " + util.getType(getPrevSibl):typeCondition ? " while " + util.getType(expected) + " has not got previous sibling element":"";
-			return {
-				pass:isPassed,
-				message:isPassed ? "Expected " + util.getType(actual) + " not to be previous sibling of " + util.getType(expected):
-								   "Expected " + util.getType(actual) + " to be previous sibling of " + util.getType(expected)+actualSibl
-			};
-		}
-	};
+	return util.dom.returnBlock(function(o,not){
+		var sibA = o[0], sibB = o[1],sibValid,prev,prevTest,pass,msgPrev,msgNull,msgAdd,msg;
+		sibValid = util.dom.isHTML(sibA)&&util.dom.isHTML(sibB);
+		prev = sibValid ? sibB.previousElementSibling:prev;
+		prevTest = sibValid ? prev===sibA:false;
+		pass = not ? sibValid&&!prevTest:sibValid&&prevTest;
+		msgPrev = " while previous sibling is " + util.dom.getType(prev);
+		msgNull = " while " + util.dom.getType(sibB) + " has not got previous sibling element";
+		msgAdd = not ? "":prev ? msgPrev:sibValid ? msgNull:"";
+		msg = "Expected " + util.dom.getType(sibA) + util.dom.notMsg(not) + " to be previous sibling of " + util.dom.getType(sibB)+msgAdd;
+		return util.dom.test(pass,msg,msg);
+	});
 };
 
 DOMCustomMatchers.toBeEmpty = function(util){
-	return {
-		compare:function(actual){
-			var typeCondition = util.isHTML(actual);
-			var getNodes = typeCondition ? actual.childNodes:[];
-			var arrayNodes = [];
-			for(var i=0;i<getNodes.length;i++){
-				if(util.isHTML(getNodes[i])){
-					if(getNodes[i].nodeName!=="BR"&&getNodes[i].nodeName!=="WBR") arrayNodes.push(getNodes[i]);
-				}
-				if(getNodes[i].nodeName==='#text'){
-					if(getNodes[i].textContent.replace(/(\s|\n|\t|\v)/g,"").length) arrayNodes.push(getNodes[i]);
-				}
-			}
-			var isEmpty = !arrayNodes.length;
-			return {
-				pass:typeCondition&&isEmpty,
-				message:typeCondition&&isEmpty ? "Expected " + util.getType(actual) + " not to be empty.":
-									"Expected " + util.getType(actual) + " to be empty."
-			};
-		}
-	};		
+	return util.dom.returnBlock(function(o,not){
+		var elem = o[0], elemValid, childNodes, emptyTest, pass, msgAdd, msg;
+		elemValid = util.dom.isHTML(elem);
+		childNodes = elemValid ? collection():[];
+		emptyTest = !childNodes.length;
+		pass = not ? elemValid&&!emptyTest:elemValid&&emptyTest;
+		msgAdd = emptyTest ? "":" while it contains " + childNodes.length + " node(s)";
+		msg = "Expected " + util.dom.getType(elem) + util.dom.notMsg(not) + " to be empty" + msgAdd;
+		return util.dom.test(pass,msg,msg);
+		
+			function collection(){
+				var nodes = elem.childNodes, parsed = [];
+					for(var i=0;i<nodes.length;i++){
+						if(util.dom.isHTML(nodes[i])){
+							if(nodes[i].nodeName!=="BR"&&nodes[i].nodeName!=="WBR") parsed.push(nodes[i]);
+						}
+						if(nodes[i].nodeName==='#text'){
+							if(nodes[i].textContent.replace(/(\s|\n|\t|\v)/g,"").length) parsed.push(nodes[i]);
+						}
+					}
+				return parsed;
+			}		
+	});	
 };
 
 DOMCustomMatchers.toHaveAnyAttribute = function(util){
-	return {
-		compare:function(actual){
-			var typeCondition = util.isHTML(actual);
-			var isPassed = typeCondition? actual.hasAttributes():false;
-			return {
-				pass:isPassed,
-				message:isPassed ? "Expected " + util.getType(actual) + " not to have any attributes defined":
-								   "Expected " + util.getType(actual) + " to have any attributes defined"
-			};
-		}
-	};
+	return util.dom.returnBlock(function(o,not){
+		var elem = o[0], elemValid, argTest, pass, msg;
+		elemValid = util.dom.isHTML(elem);
+		argTest = elemValid? elem.hasAttributes():false;
+		pass = not ? elemValid&&!argTest:elemValid&&argTest;
+		msg = "Expected " + util.dom.getType(elem) + util.dom.notMsg(not) + " to have any attributes defined";
+		return util.dom.test(pass,msg,msg);
+	});
 };
 
 DOMCustomMatchers.toHaveAttribute = function(util){
-	return {
-		compare:function(actual,attr,val){
-			var typeCondition = util.isHTML(actual);
-			var isAttrString = util.is(attr,'string');
-			var hasAttr = typeCondition&&isAttrString ? actual.hasAttribute(attr):false;
-			var isValString = util.is(val,'string');
-			var isValRegEx = util.is(val,'regex');
-			var attrType = isAttrString ? "'"+attr+"'":'of type '+util.getType(attr);
-			var hasValue = !hasAttr ? false:typeof val==="undefined" ? true:isValString ? actual.getAttribute(attr)===val:isValRegEx ? Boolean(actual.getAttribute(attr).match(val)):true;
-			var valMessage = isValString ? " of '"+ val + "' value ": isValRegEx ? " of value matched regular expression "+val:" ";
-			return {
-				pass:hasAttr&&hasValue,
-				message:hasAttr&&hasValue ? "Expected "+util.getType(actual)+" not to have an attribute "+attrType+valMessage+" specified.":
-											"Expected "+util.getType(actual)+" to have an attribute "+attrType+valMessage+" specified."
-			};
-		}
-	};
+	return util.dom.returnBlock(function(o,not){
+		var elem = o[0], attr = o[1], val = o[2], elemValid, attrValid, attrTest, strValid, regValid, valTest, pass, msgAttr, msgVal, msg;
+		elemValid = util.dom.isHTML(elem);
+		attrValid = util.dom.is(attr,'string');
+		strValid = util.dom.is(val,'string');
+		regValid = util.dom.is(val,'regex');
+		attrTest = elemValid&&attrValid ? elem.hasAttribute(attr):false;
+		valTest = !attrTest ? false:typeof val==="undefined" ? true:strValid ? elem.getAttribute(attr)===val:regValid ? Boolean(elem.getAttribute(attr).match(val)):true;
+		pass = not ? elemValid&&attrValid&&!(attrTest&&valTest):elemValid&&attrValid&&(attrTest&&valTest);
+		msgAttr = !elemValid ? "":attrValid ? " '"+attr+"'":' of type '+util.dom.getType(attr);
+		msgVal = !elemValid||!attrValid ? "":strValid ? " of '"+ val + "' value ":regValid ? " of value matched regular expression "+val:"";
+		msg = "Expected "+util.dom.getType(elem) + util.dom.notMsg(not) + " to have an attribute" + msgAttr + msgVal + " specified";		
+		return util.dom.test(pass,msg,msg);
+	});
 };
 
 DOMCustomMatchers.toHaveClass = function(util){
-	return {
-		compare:function(actual,val){
-			var typeCondition = util.isHTML(actual);
-			var isValString = util.is(val,'string');
-			var hasClass = typeCondition&&isValString ? hasClass(actual):false;
-			var returnVal = isValString ? "'"+val+"'":"of type "+util.getType(val);
-			return {
-				pass:hasClass,
-				message:hasClass ?	"Expected "+util.getType(actual)+" not to have class " + returnVal +".":
-									"Expected "+util.getType(actual)+" to have class " + returnVal +"."
-			};
-				function hasClass(elem){
-					var getClassAttr = elem.getAttribute('class');
-					var createArray = getClassAttr!==null&&getClassAttr.replace(/\s\s+/g,"")!=="" ? getClassAttr.split(" "):[];
-					var hasClass = createArray.some(function(curr){return curr===val;});
-					return hasClass;
-				}
-		}
-	};
+	return util.dom.returnBlock(function(o,not){
+		var elem = o[0], clss = o[1], elemValid, clssValid, valid, clssTest, pass, msgAdd, msg;
+		elemValid = util.dom.isHTML(elem);
+		clssValid = util.dom.is(clss,'string');
+		valid = elemValid && clssValid;
+		clssTest = valid ? hasClass(elem):false;
+		pass = not ? valid&&!clssTest:valid&&clssTest;
+		msgAdd = !elemValid ? "":clssValid ? " '"+clss+"'":" of type "+util.dom.getType(clss);
+		msg = "Expected "+util.dom.getType(elem) + util.dom.notMsg(not) + " to have class" + msgAdd;
+		return util.dom.test(pass,msg,msg);
+		
+			function hasClass(elem){
+				var attr = elem.getAttribute('class');
+				var collection = attr!==null&&attr.replace(/\s\s+/g,"")!=="" ? attr.split(" "):[];
+				var classTest = collection.some(function(c){return c===clss;});
+				return classTest;
+			}		
+	});	
 };
 
 DOMCustomMatchers.toHaveComputedStyle = function(util){
-	return {
-		compare:function(actual,prop,val){
-			var typeCondition = util.isHTML(actual);
-			var isDOM = typeCondition ? document.documentElement.contains(actual)&&document.documentElement!==actual:false;
-			var isPropString = util.is(prop,'string');
-			var hyphenProp = isPropString ? prop.replace(/[A-Z]/g,function(g){return '-'+g.toLowerCase();}):prop;
-			var camelProp = isPropString ? prop.replace(/\x2D\w/g,function(g){return g[1].toUpperCase();}):prop;
-			var isValString = util.is(val,'string');
-			var isValRegExp = util.is(val,'regexp');
-			var CSSObj = typeCondition&&isDOM&&isPropString ? window.getComputedStyle(actual,null):CSSObj;
-			var isPropDefined = CSSObj ? typeof CSSObj[camelProp]!=='undefined':false;
-			var getComputed = CSSObj ? CSSObj.getPropertyValue(hyphenProp):false;
-			var isPassed = !isPropDefined ? false:isValString ? getComputed===val:isValRegExp ? Boolean(getComputed.match(val)):false;
-			var mDOM = typeCondition&&!isDOM ? " (not a document node)":"";
-			var mProp = isPropString ? "the '"+hyphenProp+"'":"["+util.getType(prop)+"]";
-			var mComp = !isPropDefined ? "":", while the computed value is '" + getComputed + "'.";
-			var mVal = isValString ? "the value '"+val+"'":isValRegExp ? "the value matched the regular expression "+val:"["+util.getType(val)+"] value";
-			return {
-				pass:isPassed,
-				message:isPassed ? "Expected "+util.getType(actual)+mDOM+" not to have "+mProp+" style of "+mVal+".":
-								   "Expected "+util.getType(actual)+mDOM+" to have "+mProp+" style of "+mVal+mComp 
-			};
-		}
-	};
+	return util.dom.returnBlock(function(o,not){
+		var elem = o[0], prop = o[1], val = o[2], elemValid, domValid, propValid, strValid, regValid, valid, propHyphen, propCamel, cssObject, cssValue, propTest, valTest, pass, msgDOM, msgProp, msgCssValue, msgVal, msg;
+		elemValid = util.dom.isHTML(elem);
+		domValid = elemValid ? document.documentElement.contains(elem)&&document.documentElement!==elem:false;
+		propValid = util.dom.is(prop,'string');
+		strValid = util.dom.is(val,'string');
+		regValid = util.dom.is(val,'regexp');
+		valid = elemValid && domValid && propValid && (strValid || regValid);
+		propHyphen = propValid ? prop.replace(/[A-Z]/g,function(g){return '-'+g.toLowerCase();}):prop;
+		propCamel = propValid ? prop.replace(/\x2D\w/g,function(g){return g[1].toUpperCase();}):prop;
+		cssObject = elemValid&&domValid&&propValid ? window.getComputedStyle(elem,null):cssObject;
+		cssValue = cssObject ? cssObject.getPropertyValue(propHyphen):false;
+		propTest = cssObject ? typeof cssObject[propCamel]!=='undefined':false;
+		valTest = !propTest ? false:strValid ? cssValue===val:regValid ? Boolean(cssValue.match(val)):false;
+		pass = not ? valid&&!valTest:valid&&valTest;
+		msgDOM = elemValid&&!domValid ? " (not a document node)":"";
+		msgProp = !(elemValid&&domValid) ? "":propValid ? "'"+propHyphen+"'":"["+util.dom.getType(prop)+"]";
+		msgCssValue = !valid||!propTest ? "":", while the computed value is '" + cssValue + "'";
+		msgVal = !(propValid&&elemValid&&domValid) ? "":strValid ? " of the value '"+val+"'":regValid ? " of the value matched the regular expression "+val:" of ["+util.dom.getType(val)+"] value";
+		msg = "Expected " + util.dom.getType(elem) + msgDOM + util.dom.notMsg(not) + " to have the " + msgProp + " style" + msgVal + msgCssValue;
+		return util.dom.test(pass,msg,msg);
+	});	
 };
 
 DOMCustomMatchers.toHaveComputedColor = function(util){
-	return {
-		compare:function(actual,prop,val){
-			var typeCondition = util.isHTML(actual);
-			var isDOM = typeCondition ? document.documentElement.contains(actual)&&document.documentElement!==actual:false;
-			var isPropString = util.is(prop,'string');
-			var isValString = util.is(val,'string');
-			var hyphenProp = isPropString ? prop.replace(/[A-Z]/g,function(g){return '-'+g.toLowerCase();}):prop;
-			var camelProp = isPropString ? prop.replace(/\x2D\w/g,function(g){return g[1].toUpperCase();}):prop;
-			var CSSObj = typeCondition&&isDOM&&isPropString ? window.getComputedStyle(actual,null):CSSObj;
-			var isPropDefined = CSSObj ? typeof CSSObj[camelProp]!=='undefined':false;
-			var getComputed = CSSObj ? CSSObj.getPropertyValue(hyphenProp):false;
-			var isPassed = !isPropDefined ? false:!isValString ? false:isEqual(getComputed,val);
-			var mDOM = typeCondition&&!isDOM ? " (not a document node)":"";
-			var mProp = isPropString ? "the '"+hyphenProp+"'":"["+util.getType(prop)+"]";
-			var mVal = isValString ? "the value '"+val+"'":"["+util.getType(val)+"] value";
-			var mComp = !isPropDefined ? "":", while the computed value is '" + getComputed + "'.";
-			
-			return {
-				pass:isPassed,
-				message:isPassed ? "Expected "+util.getType(actual)+mDOM+" not to have "+mProp+" style of "+mVal+".":
-								   "Expected "+util.getType(actual)+mDOM+" to have "+mProp+" style of "+mVal+mComp
-			};
-			
-			function isEqual(getComputed,value){
-				var computedArray, convertedArray;
-				if(isType(getComputed,1,true)) computedArray = rgbToRGB(getComputed,true);
-				if(isType(getComputed,2,true)) computedArray = rgbToRGB(getComputed,false);
-				if(isType(getComputed,5,true)) computedArray = [0,0,0,0];
+	return util.dom.returnBlock(function(o,not){
+		var elem = o[0], prop = o[1], val = o[2], elemValid, domValid, propValid, valValid, valid, propHyphen, propCamel, cssObject, cssValue, propTest, valTest, pass, msgDOM, msgProp, msgCssValue, msgVal,msg;
+		elemValid = util.dom.isHTML(elem);
+		domValid = elemValid ? document.documentElement.contains(elem)&&document.documentElement!==elem:false;
+		propValid = util.dom.is(prop,'string');
+		valValid = util.dom.is(val,'string');
+		valid = elemValid&&domValid&&propValid&&valValid;
+		propHyphen = propValid ? prop.replace(/[A-Z]/g,function(g){return '-'+g.toLowerCase();}):prop;
+		propCamel = propValid ? prop.replace(/\x2D\w/g,function(g){return g[1].toUpperCase();}):prop;
+		cssObject = elemValid&&domValid&&propValid ? window.getComputedStyle(elem,null):cssObject;
+		cssValue = cssObject ? cssObject.getPropertyValue(propHyphen):false;
+		propTest = cssObject ? typeof cssObject[propCamel]!=='undefined':false;
+		valTest = !propTest ? false:!valValid ? false:isEqual(cssValue,val);
+		pass = not ? valid&&!valTest:valid&&valTest;
+		msgDOM = elemValid&&!domValid ? " (not a document node)":"";
+		msgProp = !(elemValid&&domValid) ? "":propValid ? "'"+propHyphen+"'":"["+util.dom.getType(prop)+"]";
+		msgCssValue = !valid||!propTest ? "":", while the computed value is '" + cssValue + "'";
+		msgVal = !(propValid&&elemValid&&domValid) ? "":valValid ? " of the value '"+val+"'":" of ["+util.dom.getType(val)+"] value";
+		msg =  "Expected " + util.dom.getType(elem) + msgDOM + util.dom.notMsg(not) + " to have the " + msgProp + " style" + msgVal + msgCssValue;
+		return util.dom.test(pass,msg,msg);
 
-				if(isType(value,0,false)) convertedArray = hexToRGB(value);
-				if(isType(value,1,false)) convertedArray = rgbToRGB(value,true);
-				if(isType(value,2,false)) convertedArray = rgbToRGB(value,false);
-				if(isType(value,3,false)) convertedArray = hslToRGB(value,true);
-				if(isType(value,4,false)) convertedArray = hslToRGB(value,false);
-				if(isType(value,5,false)) convertedArray = [0,0,0,0];
+			function isEqual(comput,val){
+				var a, b;
+				if(isType(comput,1,1)) a = rgbToRGB(comput,true);
+				if(isType(comput,2,1)) a = rgbToRGB(comput,false);
+				if(isType(comput,5,1)) a = [0,0,0,0];
+
+				if(isType(val,0,0)) b = hexToRGB(val);
+				if(isType(val,1,0)) b = rgbToRGB(val,true);
+				if(isType(val,2,0)) b = rgbToRGB(val,false);
+				if(isType(val,3,0)) b = hslToRGB(val,true);
+				if(isType(val,4,0)) b = hslToRGB(val,false);
+				if(isType(val,5,0)) b = [0,0,0,0];
 				
-				if(!computedArray||!convertedArray) return false;
-				return util.equals(computedArray,convertedArray);
+				return (!a||!b) ? false:util.equals(a,b);
 			}		
 
 			function isType(val,t,allowContent){
-				var before = [/^\s*/,/^.*/][+allowContent].source;
-				var after = [/\s*$/,/.*$/][+allowContent].source;
-				var type = [/\x23(([A-F]|[0-9]){3}\s*$|([A-F]|[0-9]){6})/i,
-							/rgb\x28(\s*(\d|\d{2}|[0-1]\d{2}|[0-2][0-4]\d|[0-2][0-5]{2})\s*\x2C\s*){2}(\s*(\d|\d{2}|[0-1]\d{2}|[0-2][0-4]\d|[0-2][0-5]{2})\s*)\x29/,
-							/rgba\x28(\s*(\d|\d{2}|[0-1]\d{2}|[0-2][0-4]\d|[0-2][0-5]{2})\s*\x2C\s*){3}(\s*([0-1]|0\x2E\d+|\x2E\d+|1\x2E0+)\s*)\x29/,
-							/hsl\x28\s*(\d|\d{2}|[0-2]\d{2}|[0-3][0-5]\d|360)(\s*\x2C\s*(\d{1,2}(\x2E\d+)?|100)\x25\s*){2}\x29/,
-							/hsla\x28\s*(\d|\d{2}|[0-2]\d{2}|[0-3][0-5]\d|360)(\s*\x2C\s*(\d{1,2}(\x2E\d+)?|100)\x25\s*){2}\x2C\s*([0-1]|0\x2E\d+|\x2E\d+|1\x2E0+)\s*\x29/,
-							/transparent/i];
-				var ignoreCase = type[t].ignoreCase ? 'i':'';
-				var generateRegEx = new RegExp(before + type[t].source + after,ignoreCase);
-				return val.search(generateRegEx)>=0;
+				var before = [/^\s*/,/^.*/][allowContent].source;
+				var after =	 [/\s*$/,/.*$/][allowContent].source;
+				var type =   [/\x23(([A-F]|[0-9]){3}\s*$|([A-F]|[0-9]){6})/i,
+							  /rgb\x28(\s*(\d|\d{2}|[0-1]\d{2}|[0-2][0-4]\d|[0-2][0-5]{2})\s*\x2C\s*){2}(\s*(\d|\d{2}|[0-1]\d{2}|[0-2][0-4]\d|[0-2][0-5]{2})\s*)\x29/,
+							  /rgba\x28(\s*(\d|\d{2}|[0-1]\d{2}|[0-2][0-4]\d|[0-2][0-5]{2})\s*\x2C\s*){3}(\s*([0-1]|0\x2E\d+|\x2E\d+|1\x2E0+)\s*)\x29/,
+							  /hsl\x28\s*(\d|\d{2}|[0-2]\d{2}|[0-3][0-5]\d|360)(\s*\x2C\s*(\d{1,2}(\x2E\d+)?|100)\x25\s*){2}\x29/,
+							  /hsla\x28\s*(\d|\d{2}|[0-2]\d{2}|[0-3][0-5]\d|360)(\s*\x2C\s*(\d{1,2}(\x2E\d+)?|100)\x25\s*){2}\x2C\s*([0-1]|0\x2E\d+|\x2E\d+|1\x2E0+)\s*\x29/,
+							  /transparent/i][t];
+				var ignoreCase = type.ignoreCase ? 'i':'';
+				var newRegEx = new RegExp(before + type.source + after,ignoreCase);
+				return val.search(newRegEx)>=0;
 			}
 			
 			function hslToRGB(color,addAlpha){
-				var r,g,b,h,s,l,a;
+				var r,g,b,h,s,l,a,c,t;
 				var parsed = color.slice(color.search(/\x28/)+1,color.search(/\x29/)).replace(/\x25/g,"").split(',');
 				parsed.forEach(function(a,b,c){c[b] = Number(a);});
 				if(addAlpha) parsed.push(1);
@@ -424,8 +413,8 @@ DOMCustomMatchers.toHaveComputedColor = function(util){
 				if(s === 0){
 					r = g = b = Math.round(l*255);
 					}else{
-						var c = l >= 0.5 ? (s+l)-l*s:l*(s+1);
-						var t = 2 * l - c;
+						c = l >= 0.5 ? (s+l)-l*s:l*(s+1);
+						t = 2 * l - c;
 						r = parse(t, c, h + 1/3);
 						g = parse(t, c, h);
 						b = parse(t, c, h - 1/3);
@@ -451,30 +440,32 @@ DOMCustomMatchers.toHaveComputedColor = function(util){
 			}
 
 			function rgbToRGB(color,addAlpha){
-				var parsed = color.slice(color.search(/\x28/)+1,color.search(/\x29/)).split(',');
-				parsed.forEach(function(a,b,c){c[b] = Number(a);});
-				if(addAlpha) parsed.push(1);				
-				parsed[3] = Number(parsed[3].toFixed(2));
-				return parsed;
+				var r = color.slice(color.search(/\x28/)+1,color.search(/\x29/)).split(',');
+				r.forEach(function(a,b,c){c[b] = Number(a);});
+				if(addAlpha) r.push(1);				
+				r[3] = Number(r[3].toFixed(2));
+				return r;
 			}
-		}
-	};
+	});	
 };
 
 DOMCustomMatchers.toHaveEvent = function(util){
-	return {
-		compare:function(actual,ev){
-			var typeCondition = util.isHTML(actual);
-			var isEventString = util.is(ev,'string');
-			var getEvent = isEventString ? ev.replace(/\s/g,"").toLowerCase():ev;
-			var parseEvent = isEventString ? getEvent.search('on')===0 ? getEvent:'on'+getEvent:parseEvent;
-			var isPassed = typeCondition ? Boolean(actual[parseEvent]):false;
-			var isRecognized = typeCondition ? typeof actual[parseEvent]==='undefined' ? "unrecognized ":parseEvent:"";
-			return {
-				pass:isPassed,
-				message: isPassed ? "Expected "+util.getType(actual)+" not to have "+isRecognized+" event attached":
-									"Expected "+util.getType(actual)+" to have "+isRecognized+" event attached"
-			};
-		}
-	};
+	return util.dom.returnBlock(function(o,not){
+		var elem = o[0],evnt = o[1], elemValid, evntValid, valid, getEvnt, evntTest, evntExist, pass, msgEvent, msg;
+		elemValid = util.dom.isHTML(elem);
+		evntValid = util.dom.is(evnt,'string');
+		valid = elemValid&&evntValid;
+		getEvnt = evntValid ? parseEvent(evnt):evnt;
+		evntTest = elemValid ? Boolean(elem[getEvnt]):false;
+		evntExist = elemValid ? typeof elem[getEvnt]!=='undefined':false;
+		pass = not ? valid&&evntExist&&!evntTest:valid&&evntExist&&evntTest;
+		msgEvent = !elemValid ? "":!evntExist ? "unrecognized ":getEvnt;
+		msg = "Expected " + util.dom.getType(elem) + util.dom.notMsg(not) + " to have " + msgEvent + " event attached";
+		return util.dom.test(pass,msg,msg);
+
+			function parseEvent(ev){
+				ev = ev.replace(/\s/g,"").toLowerCase();
+				return ev.search('on')===0 ? ev:'on'+ev;				
+			}
+	});
 };

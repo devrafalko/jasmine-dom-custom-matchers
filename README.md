@@ -133,7 +133,7 @@ Examine the *[Samples of usage](#usage)* described below to find out how you can
  * `expect(actual).toBeNthChild(1)` the matcher checks if `actual` is the second child node of its parent
  * `expect(actual).toBeNthChild('last')` the matcher checks if `actual` is the last child node of its parent
 * it **ignores** [HTML Text] and [HTML Comment] Objects when getting the collection od child nodes
-* return **false** if `actual` is not [HTML Element]
+* return **false** if `actual` is not [HTML Element] Object
 * return **false** if `index` is not of type [Number] greater than 0 or if is not of `'last'` value
 * return **false** if `actual` is not at expected `index` inside its [HTML Element] parent
 * return **false** if `actual` has not got [HTML Element] parent
@@ -271,6 +271,8 @@ Examine the *[Samples of usage](#usage)* described below to find out how you can
 > If the browser return `rgba(255, 255, 0, .4)` as **computed 'color' style**, the **expected** `value` `rgba(255, 255, 0, .4)` and `hsla(60, 100%, 50%, .4)` will return **truthy result**.
 
 > If the browser return `rgba(255, 255, 0, .4)` as **computed 'color' style**, the **expected** `value` `rgb(255, 255, 0)`, `#ff0`, `#FFFF00` and `hsl(60, 100%, 50%)` will return **faulty result** because the **alpha parameter does not match**.
+
+> Because of the differences between browsers, the `alpha` parameter of `hsla()` and `rgba()` formats is rounded to two digits after decimal point. The same result will be aimed with `rgba(100, 100, 100, 0.23)`, `rgba(100, 100, 100, 0.230445)`, `rgba(100, 100, 100, 0.2349999999)`
 
 ##### `expect(actual).toHaveEvent(event)`
 * check if `actual` [HTML Element] Object has got expected `event` attached
