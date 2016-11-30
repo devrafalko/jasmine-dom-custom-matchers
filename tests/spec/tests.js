@@ -18,6 +18,13 @@ describe("DOM Custom Matchers",function(){
 		this.passwordInput = document.getElementById('passwordInput');
 		this.submit = document.getElementById('submit');
 		
+		var that = this;
+		this.submit.onclick = function(){
+			if(that.emailInput.value===""||that.passwordInput.value===""){
+				window.alert('fill empty inputs!');
+			}
+		};
+		
 		this.virtualDiv = document.createElement('DIV');
 		this.virtualParagraph = document.createElement('P');
 		this.virtualNextParagraph = document.createElement('P');
@@ -165,14 +172,6 @@ describe("DOM Custom Matchers",function(){
 			expect(document.documentElement).toContainHTMLElement(this.passwordInput);
 		});
 
-		it("incorrect expected parameter's type should throw faulty result",function(){
-			expect(this.form).not.toContainHTMLElement(this.emailText);
-			expect(this.form).not.toContainHTMLElement();
-			expect(this.emailSpan).not.toContainHTMLElement(123);
-			expect(this.emailSpan).not.toContainHTMLElement(null);
-			expect(this.emailSpan).not.toContainHTMLElement([1,2,3]);
-		});
-
 		it("dynamically created [HTML Element] Object should contain another dynamically created [HTML Element] Object",function(){
 			expect(this.virtualDiv).toContainHTMLElement(this.virtualParagraph);
 			expect(this.virtualDiv).toContainHTMLElement(this.virtualQuote);
@@ -242,9 +241,9 @@ describe("DOM Custom Matchers",function(){
 			expect(this.virtualTextNode).toBeChildOf(this.virtualQuote);
 		});
 		
-		it("[HTML Element] or [HTML Text] Object should not be a child of itselt",function(){
-			expect(this.emailText).not.toBeChildOf(this.emailText);
-			expect(this.virtualTextNode).not.toBeChildOf(this.virtualTextNode);
+		it("[HTML Element] Object should not be a child of itselt",function(){
+			expect(this.form).not.toBeChildOf(this.form);
+			expect(this.virtualDiv).not.toBeChildOf(this.virtualDiv);
 			expect(this.ul).not.toBeChildOf(this.ul);
 		});
 
@@ -252,12 +251,6 @@ describe("DOM Custom Matchers",function(){
 			expect(this.virtualParagraph).toBeChildOf(this.virtualDiv);
 			expect(this.virtualQuote).toBeChildOf(this.virtualParagraph);
 			expect(this.virtualTextNode).toBeChildOf(this.virtualQuote);
-		});		
-		
-		it("incorrect parameters' types should throw faulty result",function(){
-			expect("some text").not.toBeChildOf(this.emailText);
-			expect().not.toBeChildOf();
-			expect(123).not.toBeChildOf(null);
 		});
 	});
 
@@ -313,11 +306,6 @@ describe("DOM Custom Matchers",function(){
 			expect(this.form).not.toBeParentOf(this.ul);
 		});
 		
-		it("[HTML Text] Object should not be a parent of any HTML Object",function(){
-			expect(this.passwordText).not.toBeParentOf("some text");
-			expect(this.virtualTextNode).not.toBeParentOf(this.virtualQuote);
-		});
-		
 		it("[HTML Element] or [HTML Text] Object should not be a parent of itselt",function(){
 			expect(this.virtualParagraph).not.toBeParentOf(this.virtualParagraph);
 			expect(document.body).not.toBeParentOf(document.body);
@@ -329,17 +317,17 @@ describe("DOM Custom Matchers",function(){
 			expect(this.virtualParagraph).toBeParentOf(this.virtualQuote);
 			expect(this.virtualQuote).toBeParentOf(this.virtualTextNode);
 		});			
-		
-		it("incorrect parameters' types should throw faulty result",function(){
-			expect(this.passwordText).not.toBeParentOf("some text");
-			expect(String).not.toBeParentOf("abcd");
-			expect().not.toBeParentOf();			
-		});
 	});
 
 	describe("toHaveSameParent()",function(){
 		it("<body> and <head> should have the same <html> parent",function(){
 			expect(document.body).toHaveSameParent(document.head);
+		});
+		
+		it("the same element should have the same parent element",function(){
+			expect(this.form).toHaveSameParent(this.form);
+			expect(this.ul).toHaveSameParent(this.ul);
+			expect(this.virtualTextNode).toHaveSameParent(this.virtualTextNode);
 		});
 		
 		it("all <li> elements should have the same <ul> parent",function(){
@@ -425,11 +413,6 @@ describe("DOM Custom Matchers",function(){
 			expect(this.virtualParagraph).toHaveChildren();
 			expect(this.virtualQuote).not.toHaveChildren();
 		});
-		
-		it("[HTML Text] Object cannot have any children",function(){
-			expect(this.emailText).not.toHaveChildren();
-			expect(this.virtualText).not.toHaveChildren();			
-		});
 	});
 	
 	describe("toBeNextSiblingOf()",function(){
@@ -514,18 +497,13 @@ describe("DOM Custom Matchers",function(){
 			expect(this.virtualParagraph).not.toBeEmpty();
 			expect(this.virtualQuote).not.toBeEmpty();
 		});
-		
-		it("incorrect parameter' type should throw faulty result",function(){
-			expect(123).not.toBeEmpty();
-			expect(this.virtualTextNode).not.toBeEmpty();			
-			expect(this.emailText).not.toBeEmpty();			
-		});
 	});
 
 	describe("toHaveAnyAttribute()",function(){
 		it("<head> element should not have any attribute",function(){
 			expect(document.head).not.toHaveAnyAttribute();
-		});		
+		});
+		
 		it("<form> <fieldset> and <li> elements should have some attributes defined",function(){
 			expect(this.form).toHaveAnyAttribute();
 			expect(this.fieldset).toHaveAnyAttribute();
@@ -537,11 +515,6 @@ describe("DOM Custom Matchers",function(){
 		it("dynamically created [HTML Element] should also have some attributes",function(){
 			expect(this.virtualDiv).toHaveAnyAttribute();
 		});
-		
-		it("[HTML Text] nodes should throw faulty result when tested",function(){
-			expect(this.virtualTextNode).not.toHaveAnyAttribute();
-			expect(this.passwordText).not.toHaveAnyAttribute();
-		});	
 	});
 
 	describe("toHaveAttribute()",function(){
@@ -569,8 +542,8 @@ describe("DOM Custom Matchers",function(){
 			expect(this.liC).toHaveAttribute('id',/li\w+/);
 		});
 
-		it("submit element should be of type submit, should be disabled and have value='Login'",function(){
-			expect(this.submit).toHaveAttribute('disabled');
+		it("submit element should be of type submit, should not be disabled and have value='Login'",function(){
+			expect(this.submit).not.toHaveAttribute('disabled');
 			expect(this.submit).toHaveAttribute('type','submit');
 			expect(this.submit).toHaveAttribute('value',/login/i);
 		});
@@ -701,16 +674,31 @@ describe("DOM Custom Matchers",function(){
 			expect(this.submit).toHaveComputedColor('backgroundColor','hsl(23,93.1%,54.5%)');
 			expect(this.submit).toHaveComputedColor('backgroundColor','hsla(23,93.1%,54.5%,1)');
 		});
-		
+
 	});
+	describe("toHaveEvent()",function(){
+		it("email input should have onmouseover event attached",function(){
+			expect(this.emailInput).toHaveEvent('mouseover');
+			expect(this.emailInput).toHaveEvent('onmouseover');
+		});
+		
+		it("form element should have onsubmit event attached",function(){
+			this.form.onsubmit = function(e){
+				e.preventDefault();
+			};
+			expect(this.form).toHaveEvent('submit');
+		});
+		
+		it("submit button should have onclick event attached",function(){
+			expect(this.submit).toHaveEvent('click');
+			expect(this.submit).toHaveEvent('onclick');
+		});
 
+		it("dynamically created [HTML Element] should have also some events attached",function(){
+			this.virtualDiv.onclick = function(){return 'hello world!';};
+			this.virtualDiv.onmouseover = function(){return 'hello world!';};
+			expect(this.virtualDiv).toHaveEvent('click');
+			expect(this.virtualDiv).toHaveEvent('onmouseover');
+		});			
+	});
 });
-
-
-
-
-
-
-
-
-

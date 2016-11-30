@@ -10,7 +10,7 @@
 # Description
 
 ##### How does **DOMCustomMatchers** work?
-A custom matcher setting up has changed with the release of **jasmine 2.0**. This library provides **18 custom matchers** adjusted to the new way of matchers constructing, let to compare DOM Objects relations and states.
+A custom matcher setting up has changed with the release of **jasmine 2.0**. This library provides **19 custom matchers** adjusted to the new way of matchers constructing, let to compare DOM Objects relations and states.
 
 ##### What can I use **DOMCustomMatchers** for?
  * to check if the actual parameter is HTML Element *[[see below]](#expectactualtobehtmlelementname)*
@@ -31,6 +31,7 @@ A custom matcher setting up has changed with the release of **jasmine 2.0**. Thi
  * to check if HTML Element has got expected class *[[see below]](#expectactualtohaveclassclass)*
  * to check if HTML Element (DOM node) has got expected style (computed style) *[[see below]](#expectactualtohavecomputedstylepropvalue)*
  * to check if HTML Element (DOM node) has got expected color (computed style) *[[see below]](#expectactualtohavecomputedcolorpropvalue)*
+ * to check if HTML Element has got expected event attached *[[see below]](#expectactualtohaveeventevent)*
 
 ##### **DOM Custom Matchers** list
  * `expect(actual).toBeHTMLElement(name)` *[[see below]](#expectactualtobehtmlelementname)*
@@ -51,6 +52,9 @@ A custom matcher setting up has changed with the release of **jasmine 2.0**. Thi
  * `expect(actual).toHaveClass(class)` *[[see below]](#expectactualtohaveclassclass)*
  * `expect(actual).toHaveComputedStyle(prop,value)` *[[see below]](#expectactualtohavecomputedstylepropvalue)*
  * `expect(actual).toHaveComputedColor(prop,value)` *[[see below]](#expectactualtohavecomputedcolorpropvalue)*
+ * `expect(actual).toHaveEvent(event)` *[[see below]](#expectactualtohaveeventevent)*
+ 
+ 
 
 ##### Where can I check how **DOMCustomMatchers** work?
 Examine the *[Samples of usage](#usage)* described below to find out how you can use DOM custom matchers.
@@ -129,7 +133,7 @@ Examine the *[Samples of usage](#usage)* described below to find out how you can
  * `expect(actual).toBeNthChild(1)` the matcher checks if `actual` is the second child node of its parent
  * `expect(actual).toBeNthChild('last')` the matcher checks if `actual` is the last child node of its parent
 * it **ignores** [HTML Text] and [HTML Comment] Objects when getting the collection od child nodes
-* return **false** if `actual` is not [HTML Element]
+* return **false** if `actual` is not [HTML Element] Object
 * return **false** if `index` is not of type [Number] greater than 0 or if is not of `'last'` value
 * return **false** if `actual` is not at expected `index` inside its [HTML Element] parent
 * return **false** if `actual` has not got [HTML Element] parent
@@ -267,6 +271,22 @@ Examine the *[Samples of usage](#usage)* described below to find out how you can
 > If the browser return `rgba(255, 255, 0, .4)` as **computed 'color' style**, the **expected** `value` `rgba(255, 255, 0, .4)` and `hsla(60, 100%, 50%, .4)` will return **truthy result**.
 
 > If the browser return `rgba(255, 255, 0, .4)` as **computed 'color' style**, the **expected** `value` `rgb(255, 255, 0)`, `#ff0`, `#FFFF00` and `hsl(60, 100%, 50%)` will return **faulty result** because the **alpha parameter does not match**.
+
+> Because of the differences between browsers, the `alpha` parameter of `hsla()` and `rgba()` formats is rounded to two digits after decimal point. The same result will be aimed with `rgba(100, 100, 100, 0.23)`, `rgba(100, 100, 100, 0.230445)`, `rgba(100, 100, 100, 0.2349999999)`
+
+##### `expect(actual).toHaveEvent(event)`
+* check if `actual` [HTML Element] Object has got expected `event` attached
+* it **does not detect** events attached by `addEventListener()` method
+ * &lt;div onclick='fireClick'&gt;&lt;/div&gt; this event will be detected
+ * `actual.onclick = fireClick` this event will be detected
+ * `actual.addEventListener('click',fireClick)` this event will not be detected
+* `event` must be of type [String] and must indicate expected event name, eg. `click`, `mouseover`, `focuson`, `resize` *(both `click` and prefixed `onclick` syntax accepted)*
+* return **false** if `actual` is not [HTML Element] Object or `event` is not of type [String]
+* return **false** if `event` is not recognized event name
+* return **false** if `actual` has not got expected `event` attached
+* return **false** if `actual` has got expected `event` attached by the `addEventListener()` method
+* return **true** if `actual` has got expected `event` attached
+* return **true** regardless `actual` is appended to the DOM or not
 
 # Tips
 > Each matcher demands accurate type of parameter value. The matcher check the `actual` and `expected` parameters' types before implementing the comparison and return false when value type is incorrect regardless the comparison result.
