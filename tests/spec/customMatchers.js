@@ -13,7 +13,13 @@ jasmine.matchersUtil.dom.isHTML = function(getElem){
 };
 
 jasmine.matchersUtil.dom.getType = function(getValue){
-	return getValue===null ? 'null':typeof getValue==="undefined" ? 'undefined':getValue.constructor.name;
+	if(this.isHTML(getValue)){
+		var id = getValue.id;
+		var ret = id.length ? "#"+id:"";
+		return getValue.tagName+ret;	
+		} else {
+			return getValue===null ? 'null':typeof getValue==="undefined" ? 'undefined':getValue.constructor.name;
+			}
 };
 
 jasmine.matchersUtil.dom.shortenStr = function(getValue){
