@@ -4,15 +4,15 @@
 3. [Methods](#methods)
 4. [Tips](#tips)
 5. [Implementation](#implementation)
-5. [Usage](#usage)
+5. [How to use](#how-to-use)
 6. [License](#license)
 
 # Description
 
-##### How does **DOMCustomMatchers** work?
-A custom matcher setting up has changed with the release of **jasmine 2.0**. This library provides **19 custom matchers** adjusted to the new way of matchers constructing, let to compare DOM Objects relations and states.
+##### How does **jasmine-dom-custom-matchers** work?
+A custom matcher setting up has changed with the release of **jasmine 2.0**. This library provides **19 custom matchers** adjusted to the new way of matchers constructing. It lets you compare DOM Objects relations and states.
 
-##### What can I use **DOMCustomMatchers** for?
+##### What can I use **jasmine-dom-custom-matchers** for?
  * to check if the actual parameter is HTML Element *[[see below]](#expectactualtobehtmlelementname)*
  * to check if the actual parameter is HTML Text *[[see below]](#expectactualtobehtmltextcontent)*
  * to check if the HTML Element or HTML Text is appended to the document *[[see below]](#expectactualtobedocumentnode)*
@@ -56,8 +56,8 @@ A custom matcher setting up has changed with the release of **jasmine 2.0**. Thi
  
  
 
-##### Where can I check how **DOMCustomMatchers** work?
-Examine the *[Samples of usage](#usage)* described below to find out how you can use DOM custom matchers.
+##### Where can I check how **jasmine-dom-custom-matchers** work?
+Examine the *[Samples](#how-to-use)* described below to find out how you can use DOM custom matchers.
  
 # Browser Support
 |Chrome|Firefox|IE|Edge|Safari|Opera|iOS Safari|Opera Mini
@@ -299,35 +299,66 @@ Exception is `.toBeDocumentNode()` matcher which check if `actual` Object is app
 >In order to check whether two HTML Objects are equal objects use the native matcher `expect(objectA).toEqual(objectB)`
 
 # Implementation
-
-#### 1. Download *DOMCustomMatchers.js* file and add it to your HTML file.
-```html
-<script type="text/javascript" src="jasmine/lib/DOMCustomMatchers.js"></script>
-```
-> **Any outer libraries needed**. It is a fully JavaScript library.
-
-#### 2. Register the DOMCustomMatchers with Jasmine in each suit you want them to use.
+#### with NodeJS
+`npm install jasmine-dom-custom-matchers --save-dev`
 ```javascript
+var matchers = require('jasmine-dom-custom-matchers'); //get the module
+
 describe("The new DIV element", function() {
-    beforeEach(function() {
-        jasmine.addMatchers(customMatchers);
+    beforeAll(function() {
+        jasmine.addMatchers(matchers);  //set custom matchers for jasmine
         this.newDiv = document.createElement('DIV');
     });
     it("should be empty.", function() {
-        expect(this.newDiv).toBeEmpty();
+        expect(this.newDiv).toBeEmpty();    //do the magic with new DOM matchers
     });
 }
 ```
 
-# Usage
-* visit [sample site](https://devrafalko.github.io/jasmine-DOM-custom-matchers/tests/jasmineRunner.html) and consider jasmine passed specs section (you can see how DOM custom matchers can be used)
-* consider the [HTML source](https://github.com/devrafalko/jasmine-DOM-custom-matchers/blob/master/tests/jasmineRunner.html) with the login panel sample
-* consider the [&lt;style&gt; section](https://github.com/devrafalko/jasmine-DOM-custom-matchers/blob/master/tests/jasmineRunner.html) with CSS styles for login panel
-* consider the [tests.js](https://github.com/devrafalko/jasmine-DOM-custom-matchers/blob/master/tests/spec/tests.js) source to figure out how matchers were implemented
+> You can use `karma-html` module to test your `.html` files in the `karma` **browser** runner [*\[git\]*](https://github.com/devrafalko/karma-html) [*\[npm\]*](https://www.npmjs.com/package/karma-html)
+
+#### with Browser
+##### 1. Add `dom-matchers.js` to the HTML file
+```html
+<head>
+    <link rel="shortcut icon" type="image/png" href="jasmine/lib/jasmine-core/jasmine_favicon.png">
+    <link rel="stylesheet" type="text/css" href="jasmine/lib/jasmine-core/jasmine.css">
+    <script type="text/javascript" src="jasmine/lib/jasmine-core/jasmine.js"></script>
+    <script type="text/javascript" src="jasmine/lib/jasmine-core/jasmine-html.js"></script>
+    <script type="text/javascript" src="jasmine/lib/jasmine-core/boot.js"></script>
+    
+    <script type="text/javascript" src="dom-matchers.js"></script>
+</head>
+```
+> **Any outer libraries needed**. It is a fully JavaScript library.
+
+##### 2. Add custom matchers to `jasmine` object
+```javascript
+describe("The new DIV element", function() {
+    beforeAll(function() {
+        jasmine.addMatchers(customMatchers);    //customMatchers is the object got from dom-matchers.js
+        this.newDiv = document.createElement('DIV');
+    });
+    it("should be empty.", function() {
+        expect(this.newDiv).toBeEmpty();    //do the magic with new DOM matchers
+    });
+}
+```
+
+# How to use
+* visit [sample site](https://devrafalko.github.io/jasmine-DOM-custom-matchers/index.html) and consider jasmine passed specs section (you can see how DOM custom matchers can be used)
+* consider the [HTML source](https://github.com/devrafalko/jasmine-DOM-custom-matchers/blob/master/index.html) with the login panel sample
+* consider the [&lt;style&gt; section](https://github.com/devrafalko/jasmine-DOM-custom-matchers/blob/master/index.html) with CSS styles for login panel
+* consider the [tests.js](https://github.com/devrafalko/jasmine-DOM-custom-matchers/blob/master/specs/tests.js) source to figure out how matchers were implemented
+
+# See also
+* `karma-html` to test your `.html` files in the `karma` **browser** runner [*\[git\]*](https://github.com/devrafalko/karma-html) [*\[npm\]*](https://www.npmjs.com/package/karma-html)
+* `jasmine` custom matchers docs [*\[link\]*](https://jasmine.github.io/edge/custom_matcher.html)
+* `jasmine` installation [*\[link\]*](https://github.com/jasmine/jasmine#installation)
 
 # License
 Released under the MIT license.
->Copyright (c) 2016 Paweł Rafałko dev.rafalko@gmail.com
+>Copyright (c) 2017 Paweł Rafałko dev.rafalko@gmail.com
 
 >Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

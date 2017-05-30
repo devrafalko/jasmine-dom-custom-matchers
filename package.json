@@ -1,0 +1,28 @@
+{
+  "name": "jasmine-dom-custom-matchers",
+  "version": "1.0.0",
+  "description": "Set of 19 jasmine custom matchers to test html DOM.",
+  "main": "lib/dom-matchers.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devrafalko/jasmine-dom-custom-matchers.git"
+  },
+  "keywords": [
+    "jasmine",
+    "dom",
+    "custom",
+    "matchers",
+    "html",
+    "document",
+    "object",
+    "model",
+    "unit",
+    "tests"
+  ],
+  "author": "Pawel Rafalko <dev.rafalko@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/devrafalko/jasmine-dom-custom-matchers/issues"
+  },
+  "homepage": "https://github.com/devrafalko/jasmine-dom-custom-matchers#readme"
+}
