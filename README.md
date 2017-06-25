@@ -5,7 +5,8 @@
 4. [Tips](#tips)
 5. [Implementation](#implementation)
 5. [How to use](#how-to-use)
-6. [License](#license)
+6. [See also](#see-also)
+7. [License](#license)
 
 # Description
 
@@ -346,10 +347,10 @@ describe("The new DIV element", function() {
 ```
 
 # How to use
-* visit [sample site](https://devrafalko.github.io/jasmine-DOM-custom-matchers/index.html) and consider jasmine passed specs section (you can see how DOM custom matchers can be used)
-* consider the [HTML source](https://github.com/devrafalko/jasmine-DOM-custom-matchers/blob/master/index.html) with the login panel sample
-* consider the [&lt;style&gt; section](https://github.com/devrafalko/jasmine-DOM-custom-matchers/blob/master/index.html) with CSS styles for login panel
-* consider the [tests.js](https://github.com/devrafalko/jasmine-DOM-custom-matchers/blob/master/specs/tests.js) source to figure out how matchers were implemented
+* visit [sample site](https://devrafalko.github.io/jasmine-dom-custom-matchers/index.html) and consider jasmine passed specs section (you can see how DOM custom matchers can be used)
+* consider the [HTML source](https://github.com/devrafalko/jasmine-dom-custom-matchers/blob/master/index.html) with the login panel sample
+* consider the [&lt;style&gt; section](https://github.com/devrafalko/jasmine-dom-custom-matchers/blob/master/index.html) with CSS styles for login panel
+* consider the [tests.js](https://github.com/devrafalko/jasmine-dom-custom-matchers/blob/master/specs/tests.js) source to figure out how matchers were implemented
 
 # See also
 * `karma-html` to test your `.html` files in the `karma` **browser** runner [*\[git\]*](https://github.com/devrafalko/karma-html) [*\[npm\]*](https://www.npmjs.com/package/karma-html)
