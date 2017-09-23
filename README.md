@@ -10,10 +10,10 @@
 
 # Description
 
-##### How does **jasmine-dom-custom-matchers** work?
-A custom matcher setting up has changed with the release of **jasmine 2.0**. This library provides **19 custom matchers** adjusted to the new way of matchers constructing. It lets you compare DOM Objects relations and states.
+##### How does **`jasmine-dom-custom-matchers`** work?
+A custom matchers syntax has changed with the release of **jasmine 2.0**. This library provides **19 custom matchers** adapted to the new way of matchers constructing. It allows you to compare DOM Objects relations and states.
 
-##### What can I use **jasmine-dom-custom-matchers** for?
+##### What can I use **`jasmine-dom-custom-matchers`** for?
  * to check if the actual parameter is HTML Element *[[see below]](#expectactualtobehtmlelementname)*
  * to check if the actual parameter is HTML Text *[[see below]](#expectactualtobehtmltextcontent)*
  * to check if the HTML Element or HTML Text is appended to the document *[[see below]](#expectactualtobedocumentnode)*
@@ -318,31 +318,35 @@ describe("The new DIV element", function() {
 
 > You can use `karma-html` module to test your `.html` files in the `karma` **browser** runner [*\[git\]*](https://github.com/devrafalko/karma-html) [*\[npm\]*](https://www.npmjs.com/package/karma-html)
 
+#### with Karma
+Use `karma-jasmine-dom` package [\[link\]](https://www.npmjs.com/package/karma-jasmine-dom) that adapts the `jasmine-dom-custom-matchers` package for `karma`.
+
 #### with Browser
-##### 1. Add `dom-matchers.js` to the HTML file
+##### 1. Load `dom-matchers.js` in html file
 ```html
 <head>
-    <link rel="shortcut icon" type="image/png" href="jasmine/lib/jasmine-core/jasmine_favicon.png">
-    <link rel="stylesheet" type="text/css" href="jasmine/lib/jasmine-core/jasmine.css">
-    <script type="text/javascript" src="jasmine/lib/jasmine-core/jasmine.js"></script>
-    <script type="text/javascript" src="jasmine/lib/jasmine-core/jasmine-html.js"></script>
-    <script type="text/javascript" src="jasmine/lib/jasmine-core/boot.js"></script>
+  <link rel="shortcut icon" type="image/png" href="jasmine/lib/jasmine-core/jasmine_favicon.png">
+  <link rel="stylesheet" type="text/css" href="jasmine/lib/jasmine-core/jasmine.css">
+  <script type="text/javascript" src="jasmine/lib/jasmine-core/jasmine.js"></script>
+  <script type="text/javascript" src="jasmine/lib/jasmine-core/jasmine-html.js"></script>
+  <script type="text/javascript" src="jasmine/lib/jasmine-core/boot.js"></script>
     
-    <script type="text/javascript" src="dom-matchers.js"></script>
+  <script type="text/javascript" src="dom-matchers.js"></script>
 </head>
 ```
 > **Any outer libraries needed**. It is a fully JavaScript library.
 
-##### 2. Add custom matchers to `jasmine` object
+##### 2. Load custom matchers with `jasmine.addMatchers` in your tests files
 ```javascript
 describe("The new DIV element", function() {
-    beforeAll(function() {
-        jasmine.addMatchers(customMatchers);    //customMatchers is the object got from dom-matchers.js
-        this.newDiv = document.createElement('DIV');
-    });
-    it("should be empty.", function() {
-        expect(this.newDiv).toBeEmpty();    //do the magic with new DOM matchers
-    });
+  beforeAll(function() {
+    //DOMCustomMatchers is the global window object got from dom-matchers.js
+    jasmine.addMatchers(DOMCustomMatchers);    
+    this.newDiv = document.createElement('DIV');
+  });
+  it("should be empty.", function() {
+    expect(this.newDiv).toBeEmpty();    //do the magic with new DOM matchers
+  });
 }
 ```
 
@@ -354,6 +358,7 @@ describe("The new DIV element", function() {
 
 # See also
 * `karma-html` to test your `.html` files in the `karma` **browser** runner [*\[git\]*](https://github.com/devrafalko/karma-html) [*\[npm\]*](https://www.npmjs.com/package/karma-html)
+* `karma-jasmine-dom` package to use `jasmine-dom-custom-matchers` with karma [*\[npm\]*](https://www.npmjs.com/package/karma-jasmine-dom)
 * `jasmine` custom matchers docs [*\[link\]*](https://jasmine.github.io/edge/custom_matcher.html)
 * `jasmine` installation [*\[link\]*](https://github.com/jasmine/jasmine#installation)
 
