@@ -156,3 +156,7 @@ declare namespace jasmine {
         toHaveEvent(event: string): boolean;
     }
 }
+
+declare module 'jasmine-dom-custom-matchers' {
+    export default {};
+}
