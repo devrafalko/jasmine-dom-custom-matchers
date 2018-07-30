@@ -1,5 +1,5 @@
 {
-  "name": "@luchsamapparat/jasmine-dom-custom-matchers",
+  "name": "jasmine-dom-custom-matchers",
   "version": "1.0.5",
   "description": "Set of 19 jasmine custom matchers to test html DOM.",
   "main": "lib/dom-matchers.js",

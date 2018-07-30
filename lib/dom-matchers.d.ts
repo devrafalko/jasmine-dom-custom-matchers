@@ -157,7 +157,7 @@ declare namespace jasmine {
     }
 }
 
-declare module '@luchsamapparat/jasmine-dom-custom-matchers' {
+declare module 'jasmine-dom-custom-matchers' {
     const _default: {};
     export default _default;
 }
