@@ -30,7 +30,7 @@ A custom matchers syntax has changed with the release of **jasmine 2.0**. This l
  * to check if HTML Element has got any attributes defined *[[see below]](#expectactualtohaveanyattribute)*
  * to check if HTML Element has got expected attribute (or expected attribute of expected value) *[[see below]](#expectactualtohaveattributenamevalue)*
  * to check if HTML Element has got expected class *[[see below]](#expectactualtohaveclassclass)*
- * to check if HTML Element (DOM node) has got expected style (computed style) *[[see below]](#expectactualtohavecomputedstylepropvalue)*
+ * to check if HTML Element (DOM node) has got expected style (computed style) *[[see below]](#expectactualtohavecomputedstylepropvaluepseudoel)*
  * to check if HTML Element (DOM node) has got expected color (computed style) *[[see below]](#expectactualtohavecomputedcolorpropvalue)*
  * to check if HTML Element has got expected event attached *[[see below]](#expectactualtohaveeventevent)*
 
