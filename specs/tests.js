@@ -649,6 +649,11 @@ describe("DOM Custom Matchers",function(){
 			expect(this.emailInput).toHaveComputedStyle('box-shadow',/inset/);
 			expect(this.passwordInput).toHaveComputedStyle('boxShadow',/inset/);
 		});
+
+    it("input labels should have asterisks after them",function(){
+			expect(this.emailSpan).toHaveComputedStyle('content','"*"',':after');
+			expect(this.passwordSpan).toHaveComputedStyle('content','"*"',':after');
+    });
 	});
 	
 	describe("toHaveComputedColor()",function(){
