@@ -134,9 +134,10 @@ declare namespace jasmine {
          *
          * @param {string} prop
          * @param {string|RegExp} value
+         * @param {string} [pseudoEl]
          * @return {boolean}
          */
-        toHaveComputedStyle(prop: string, value: string | RegExp): boolean;
+        toHaveComputedStyle(prop: string, value: string | RegExp, pseudoEl?: string): boolean;
 
         /**
          * Check if actual [HTML Element] Object's computed prop style is of expected value.

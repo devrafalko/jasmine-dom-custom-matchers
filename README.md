@@ -30,7 +30,7 @@ A custom matchers syntax has changed with the release of **jasmine 2.0**. This l
  * to check if HTML Element has got any attributes defined *[[see below]](#expectactualtohaveanyattribute)*
  * to check if HTML Element has got expected attribute (or expected attribute of expected value) *[[see below]](#expectactualtohaveattributenamevalue)*
  * to check if HTML Element has got expected class *[[see below]](#expectactualtohaveclassclass)*
- * to check if HTML Element (DOM node) has got expected style (computed style) *[[see below]](#expectactualtohavecomputedstylepropvalue)*
+ * to check if HTML Element (DOM node) has got expected style (computed style) *[[see below]](#expectactualtohavecomputedstylepropvaluepseudoel)*
  * to check if HTML Element (DOM node) has got expected color (computed style) *[[see below]](#expectactualtohavecomputedcolorpropvalue)*
  * to check if HTML Element has got expected event attached *[[see below]](#expectactualtohaveeventevent)*
 
@@ -51,7 +51,7 @@ A custom matchers syntax has changed with the release of **jasmine 2.0**. This l
  * `expect(actual).toHaveAnyAttribute()` *[[see below]](#expectactualtohaveanyattribute)*
  * `expect(actual).toHaveAttribute(name,value)` *[[see below]](#expectactualtohaveattributenamevalue)*
  * `expect(actual).toHaveClass(class)` *[[see below]](#expectactualtohaveclassclass)*
- * `expect(actual).toHaveComputedStyle(prop,value)` *[[see below]](#expectactualtohavecomputedstylepropvalue)*
+ * `expect(actual).toHaveComputedStyle(prop,value,pseudoEl)` *[[see below]](#expectactualtohavecomputedstylepropvaluepseudoel)*
  * `expect(actual).toHaveComputedColor(prop,value)` *[[see below]](#expectactualtohavecomputedcolorpropvalue)*
  * `expect(actual).toHaveEvent(event)` *[[see below]](#expectactualtohaveeventevent)*
  
@@ -241,13 +241,17 @@ Examine the *[Samples](#how-to-use)* described below to find out how you can use
 
 > to check whether [HTML Element] Object has got a *class* attribute defined regardless its values, use `.toHaveAttribute('class')` matcher
 
-##### `expect(actual).toHaveComputedStyle(prop,value)`
+##### `expect(actual).toHaveComputedStyle(prop,value,pseudoEl)`
 * check if `actual` [HTML Element] Object's computed `prop` style is of expected `value` 
 * `actual` must be appended into the DOM tree, so that the [CSSStyleDeclaration] Object could be returned
 * `prop` must be of type [String] *(both camelCase and hyphen-case are accepted)*
 * `value` must be of type [String] or [RegExp]
 * if the `value` is of type [String] the matcher checks the equality of the computed style's value and expected `value`
 * if the `value` is of type [RegExp] the matcher use `String.prototype.match()` to check if the computed style's value matches the expected `value` regular expression
+* `pseudoEl` parameter is optional
+* `pseudoEl` parameter *if passed*, must be of type [String]
+* `pseudoEl` parameter *if passed*, the matcher checks the pseudo-element of `actual` instead of the element `actual` itself
+* `pseudoEl` parameter *if not passed*, defaults to null (regular, non-pseudo, elements)
 * return **false** if `actual` is not [HTML Element] Object or `prop` is not of type [String] or `value` is not of type [String] or [RegExp]
 * return **false** if returned [CSSStyleDeclaration] Object has not contain `prop` property
 * return **false** if `actual` has got the computed `prop` style of the different value than expected `value`
